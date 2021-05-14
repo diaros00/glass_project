@@ -1,0 +1,99 @@
+{% extends 'layout.html' %} {% block content %}
+
+
+
+<div class="card text-dark bg-light" style="max-width: 70rem; margin: 2rem">
+  <div class="card-header"><h4>Add</h4></div>
+ {% if messages %} {% for message in messages %}
+
+<div class="alert alert-{{ message.tags }} collapse alert-dismissible fade show" role="alert">
+    <b>{{message}}</b>
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+
+{% endfor%} {% endif %}
+
+    <div class="card-body">
+      <div class="container-fluid" style="padding: 20px">
+        <form class="row g-3" action="/addForm" method="post">
+          {% csrf_token %}
+
+          <div class="col-md-6">
+            <label for="firstname" class="form-label">Firstname</label>
+            <input
+              type="text"
+              class="form-control"
+              id="firstname"
+              name="firstname"
+              required
+            />
+          </div>
+          <div class="col-md-6">
+            <label for="lastname" class="form-label">Lastname</label>
+            <input
+              type="text"
+              class="form-control"
+              id="lastname"
+              name="lastname"
+              required
+            />
+          </div>
+          <div class="col-md-6">
+            <label for="department" class="form-label">Department</label>
+            <input
+              type="text"
+              class="form-control"
+              id="department"
+              name="department"
+            />
+          </div>
+          <div class="col-md-6">
+            <label for="shift" class="form-label">Shift</label>
+            <input type="text" class="form-control" id="shift" name="shift" />
+          </div>
+          <div class="col-12">
+            <label for="username" class="form-label">Username</label>
+            <input
+              type="text"
+              class="form-control"
+              id="username"
+              placeholder="Username"
+              name="username"
+              required
+            />
+          </div>
+          <div class="col-6">
+            <label for="password" class="form-label">Password</label>
+            <input
+              type="text"
+              class="form-control"
+              id="password"
+              placeholder="Password"
+              name="password"
+              required
+            />
+          </div>
+          <div class="col-md-6">
+            <label for="rePassword" class="form-label">Re-Password</label>
+            <input
+              type="text"
+              class="form-control"
+              id="rePassword"
+              placeholder="rePassword"
+              name="rePassword"
+              required
+            />
+          </div>
+
+          <div class="col-12">
+            <button type="submit" class="btn btn-success">Sign in</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,67 @@
+{% extends 'layout.html' %} {% block content %}
+
+<div class="row">
+    <div class="col col-md-2">
+        <div style="margin-top: 2rem">
+            <a class="btn btn-outline-success btn-lg" href="/collector">back to collector</a
+      >
+    </div>
+  </div>
+
+  <div class="col col-md-8" style="margin-top: 2rem">
+    <div class="card text-dark bg-light" style="max-width: 80rem; ">
+  <div class="card-header text-success">
+
+  <h4>รายชื่อ Model ทั้งหมด</h4>
+
+  </div>
+    <div class="card-body ">
+
+
+  <div class="row">
+    {% comment %} <table class="table table-light table-striped "> {% endcomment %}
+
+   <table id="example1" class="table table-striped" style="width:100%">
+      <thead>
+        <tr style="font-weight:bold;">
+          <th scope="col">Name Operator</th>
+          <th scope="col">Model Code</th>
+          <th scope="col">Model Name</th>
+          <th scope="col">Model description</th>
+          <th scope="col">Date</th>
+          <th scope="col">Shift</th>
+        </tr>
+      </thead>
+      <tbody>
+    
+        <tr>
+          <th scope="row">asdf</th>
+          <td>te</td>
+          <td>tes</td>
+          <td>table-striped</td>
+          <td>{{datepick}}</td>
+          <td>{{shift}}</td>
+          
+        </tr>
+       
+      </tbody>
+    </table>
+  </div>
+  
+</div>
+</div>
+
+    <h2>Please ,choose defect .</h2>
+    <div
+      class="d-flex justify-content-center"
+      style="
+        background-image: url('../media/a001.jpg');
+
+        width: 550px;
+        height: 550px;
+      "
+    ></div>
+  </div>
+</div>
+
+{% endblock %}

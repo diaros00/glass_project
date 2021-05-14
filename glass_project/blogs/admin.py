@@ -1,0 +1,10 @@
+from django.contrib import admin
+from .models import Defect , UserProfile , modelGlass
+
+
+# Register your models here.
+admin.site.register(modelGlass)
+admin.site.register(Defect)
+admin.site.register(UserProfile)
+
+

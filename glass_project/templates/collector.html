@@ -1,0 +1,299 @@
+{% extends 'layout.html' %} {% block content %}
+<!-- Select2 CSS -->
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        var $input011 = $('#inputModelCode1')
+        $input021 = $('#inputModelName1')
+        $input031 = $('#inputModelDesc')
+
+        $input012 = $('#inputModelName2')
+        $input022 = $('#inputModelCode2')
+
+        $options1 = $input021.find('option')
+        $options2 = $input031.find('option')
+        $options3 = $input022.find('option')
+
+        $input011
+            .on('change', function() {
+                $input021.html($options1.filter('[value="' + this.value + '"]'))
+                    // $input012.html($options2.filter('[value="' + $input012 + '"]'))
+                    // $input031.html($options2.filter('[value="' + this.value + '"]'))
+            })
+            .trigger('change')
+
+        $input011
+            .on('change', function() {
+                $input031.html($options2.filter('[value="' + this.value + '"]'))
+                    // $input031.html($options2.filter('[value="' + this.value + '"]'))
+            })
+            .trigger('change')
+
+        $input012
+            .on('change', function() {
+                $input022.html($options3.filter('[value="' + this.value + '"]'))
+            })
+            .trigger('change')
+
+        $input012
+            .on('change', function() {
+                $input031.html($options2.filter('[value="' + this.value + '"]'))
+            })
+            .trigger('change')
+    })
+</script>
+
+<div class="row">
+    <div class="col col-md-2">
+        <div style="margin-top: 2rem">
+            <a class="btn btn-outline-success btn-lg" href="/home">back to home</a>
+        </div>
+    </div>
+    <div class="col col-md-8">
+        <div class="card" style="margin: 2rem">
+            <div class="card-header">
+                <h4>Add Model Collector</h4>
+            </div>
+            <div class="card-body">
+                <h6 class="card-title">กรุณาเลือกข้อมูลที่ต้องการบันทึก</h6>
+
+                <div class="row" style="margin-top: 1rem">
+
+                    <form class="row g-3" action="/choose_defect_on_glass" method="post">
+                        {% csrf_token %}
+                        <div class="input-group mb-3">
+                            <span class="input-group-text" id="basic-addon1">Name Operator</span
+            >
+            <input
+              type="text"
+              class="form-control"
+              placeholder="{{user.first_name}}"
+              aria-label="Username"
+              aria-describedby="basic-addon1"
+              disabled
+            />
+          </div>
+        </div>
+        <div id="accordion">
+          <div
+            class="row"
+            style="margin-top: 1rem; padding-left: 1rem; padding-right: 1rem"
+          >
+            <button
+              class="btn btn-success"
+              data-toggle="collapse"
+              data-target="#collapseOne"
+              aria-expanded="true"
+              aria-controls="collapseOne"
+            >
+              by Model Code
+            </button>
+            <div
+              id="collapseOne"
+              class="collapse my-2"
+              data-parent="#accordion"
+            >
+              <div class="card">
+                <div class="card-body">
+                  <div class="row" style="margin-top: 1rem">
+                    <div class="input-group mb-3">
+                      <label class="input-group-text" for="inputModelCode1"
+                        >Model Code</label
+                      >
+                      <select
+                        class="form-select"
+                        id="inputModelCode1"
+                        name="inputModelCode1"
+                      >
+                        <option selected>กรุณาเลือก Model Code</option>
+
+                        {% for modelGlass in modelGlasss %}
+
+                        <option value="{{modelGlass.id}}">
+                          {{modelGlass.model_code}}
+                        </option>
+
+                        {% endfor %}
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="row" style="margin-top: 1rem">
+                    <div class="input-group mb-3">
+                      <label class="input-group-text" for="inputModelName1"
+                        >Model Name</label
+                      >
+                      <select
+                        class="form-select"
+                        id="inputModelName1"
+                        name="inputModelName1"
+                        disabled
+                      >
+                        <option selected>กรุณาเลือก Model Name</option>
+
+                        {% for modelGlass in modelGlasss %}
+
+                        <option value="{{modelGlass.id}}">
+                          {{modelGlass.model_name}}
+                        </option>
+
+                        {% endfor %}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            class="row"
+            style="margin-top: 1rem; padding-left: 1rem; padding-right: 1rem"
+          >
+            <button
+              class="btn btn-success"
+              data-toggle="collapse"
+              data-target="#collapseTwo"
+              aria-expanded="true"
+              aria-controls="collapseTwo"
+            >
+              by Modal Name
+            </button>
+            <div
+              id="collapseTwo"
+              class="collapse my-2"
+              data-parent="#accordion"
+            >
+              <div class="card">
+                <div class="card-body">
+                  <div class="row" style="margin-top: 1rem">
+                    <div class="input-group mb-3">
+                      <label class="input-group-text" for="inputModelName2"
+                        >Model Name</label
+                      >
+                      <select
+                        class="form-select"
+                        id="inputModelName2"
+                        name="inputModelName2"
+                      >
+                        <option selected>กรุณาเลือก Model Name</option>
+
+                        {% for modelGlass in modelGlasss %}
+
+                        <option value="{{modelGlass.id}}">
+                          {{modelGlass.model_name}}
+                        </option>
+
+                        {% endfor %}
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="row" style="margin-top: 1rem">
+                    <div class="input-group mb-3">
+                      <label class="input-group-text" for="inputModelCode2"
+                        >Model Code</label
+                      >
+                      <select
+                        class="form-select"
+                        id="inputModelCode2"
+                        name="inputModelCode2"
+                        disabled
+                      >
+                        <option selected>กรุณาเลือก Model Code</option>
+
+                        {% for modelGlass in modelGlasss %}
+
+                        <option value="{{modelGlass.id}}">
+                          {{modelGlass.model_code}}
+                        </option>
+
+                        {% endfor %}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row" style="margin-top: 1rem">
+            <div class="input-group mb-3">
+              <label class="input-group-text" for="inputModelDesc"
+                >Model Description</label
+              >
+              <select
+                class="form-select"
+                id="inputModelDesc"
+                name="inputModelDesc"
+                disabled
+              >
+                <option selected>กรุณาเลือก Model Code</option>
+
+                {% for modelGlass in modelGlasss %}
+
+                <option value="{{modelGlass.id}}">
+                  {{modelGlass.model_desc}}
+                </option>
+
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+
+          <div
+            class="row"
+            style="margin-top: 1rem; padding-left: 1rem; padding-right: 1rem"
+          >
+            <input
+              type="date"
+              id="datepicker"
+              name="datepicker"
+              class="form-control"
+              placeholder="Please, select date."
+            />
+          </div>
+
+          <div class="row" style="margin-top: 2rem">
+            <div class="input-group mb-3">
+              <label class="input-group-text" for="shift">Shift</label>
+              <select class="form-select" id="shift" name="shift">
+                <option selected>กรุณาเลือกกะเวลาทำงาน</option>
+                <option value="1">A</option>
+                <option value="2">B</option>
+                <option value="3">C</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-footer">
+        <div class="row">
+          <div class="col col-9"></div>
+          < class="col col-3">
+            <button type="submit" class="btn btn-success btn-block">
+              Next
+            </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    $('#datepicker').datepicker({
+      uiLibrary: 'bootstrap4',
+    })
+
+    var collapseElementList = [].slice.call(
+      document.querySelectorAll('.collapse')
+    )
+    var collapseList = collapseElementList.map(function (collapseEl) {
+      return new bootstrap.Collapse(collapseEl)
+    })
+  </script>
+  {% endblock %}
+</div>
