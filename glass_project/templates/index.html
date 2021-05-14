@@ -1,10 +1,4 @@
-
-
-{% extends 'layout.html' %} {% block content %}
-
-
-
-{% if messages %} {% for message in messages %}
+ {% extends 'layout.html' %} {% block content %} {% if messages %} {% for message in messages %}
 
 <div class="alert alert-{{ message.tags }} collapse alert-dismissible fade show" role="alert">
     <b>{{message}}</b>
@@ -17,79 +11,66 @@
 
 
 <div style=" margin: 2rem">
-  <a class="btn btn-outline-success btn-block btn-lg" href="/collector"> Start Program Collection</a>
+    <a class="btn btn-outline-success btn-block btn-lg" href="/collector">Start Program Collection  <i class="fas fa-share-square"></i></a>
 </div>
 
 <div class="card text-dark bg-light" style="max-width: 80rem; margin: 2rem">
-  <div class="card-header text-success">
-    <div class="row">
-      <div class="col-md-3">
-            <h4>รายชื่อ Defect ทั้งหมด</h4>
-      </div>
-      <div class="col-md-7"></div>
-      <div class="col-md-2">
-                  <a
-                    href=""
-                    class="btn btn-outline-success"
-                    data-toggle="modal"
-                    data-target="#myModal1"
-                    style="width: 10rem"
-                  >
-                    Add defect</a
-                  >
-      </div>
-    </div>
-        
-
-  </div>
-  
-    <div class="card-body">
-
-      <div class="container">
+    <div class="card-header text-success">
         <div class="row">
-          <table id="example" class="table table-striped" style="width:100%">
-            <thead >
-              <tr>
-                <th scope="col">ID</th>
-                <th scope="col">Defect</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for defect in defects%}
-              <tr>
-                <th scope="row">{{defect.id}}</th>
-                <td>{{defect.defect_name}}</td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
+            <div class="col-md-3">
+                <h4>รายชื่อ Defect ทั้งหมด</h4>
+            </div>
+            <div class="col-md-7"></div>
+            <div class="col-md-2">
+                <a href="" class="btn btn-outline-success" data-toggle="modal" data-target="#myModal1" style="width: 10rem">
+                    <i class="fas fa-plus"></i> Add defect </a>
+            </div>
         </div>
 
-        
-      </div>
+
     </div>
-  </div>
+
+    <div class="card-body">
+
+        <div class="container">
+            <div class="row">
+                <table id="example" class="table table-striped" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th scope="col">ID</th>
+                            <th scope="col">Defect</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for defect in defects%}
+                        <tr>
+                            <th scope="row">{{defect.id}}</th>
+                            <td>{{defect.defect_name}}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+
+        </div>
+    </div>
+</div>
 
 
 
-  <div class="card text-dark bg-light" style="max-width: 80rem; margin: 2rem">
-  <div class="card-header text-success">
-  
-   <div class="row">
-   <div class="col-md-3">
-  <h4>รายชื่อ Model ทั้งหมด</h4>
-  </div>
+<div class="card text-dark bg-light" style="max-width: 80rem; margin: 2rem">
+    <div class="card-header text-success">
 
- 
-    <div class="col-md-7"></div>
-      <div class="col-md-2">
-      <a
-        href=""
-        class="btn btn-outline-success"
-        data-toggle="modal"
-        data-target="#myModal2"
-        style="width: 10rem"
-        >Add Model</a
+        <div class="row">
+            <div class="col-md-3">
+                <h4>รายชื่อ Model ทั้งหมด</h4>
+            </div>
+
+
+            <div class="col-md-7"></div>
+            <div class="col-md-2">
+                <a href="" class="btn btn-outline-success" data-toggle="modal" data-target="#myModal2" style="width: 10rem"><i class="fas fa-plus"></i> Add Model</a
       >
     </div>
   </div>
@@ -165,7 +146,7 @@
               class="form-control"
               id="defect_name"
               name="defect_name"
-              
+              required
             />
           </div>
           
@@ -175,9 +156,9 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-outline-danger" data-dismiss="modal">
-          Close
+          <i class="fas fa-times-circle"></i> Close
         </button>
-        <button type="submit" class="btn btn-outline-success">Save changes</button>
+        <button type="submit" class="btn btn-outline-success"><i class="fas fa-save"></i> Save changes</button>
       </div>
     </div>
     </form>
@@ -216,7 +197,7 @@
               class="form-control"
               id="model_code"
               name="model_code"
-              
+              required
             />
           </div>
       
@@ -227,7 +208,7 @@
               class="form-control"
               id="model_name"
               name="model_name"
-              
+              required
             />
           </div>
 
@@ -238,21 +219,21 @@
               class="form-control"
               id="model_desc"
               name="model_desc"
-              
+              required
             />
           </div>
           {{ form.as_p }} 
-            <label for="img">Select image:</label>
-            <input type="file" id="img" name="img" >
+            <label for="img">Select image (600x600 px) : </label>
+            <input type="file" id="img" name="img" required>
            
          
       
       </div>
       <div class="modal-footer">
          <button type="button" class="btn btn-outline-danger" data-dismiss="modal">
-          Close
+          <i class="fas fa-times-circle"></i> Close
         </button>
-        <button type="submit" class="btn btn-outline-success">Save changes</button>
+        <button type="submit" class="btn btn-outline-success"><i class="fas fa-save"></i> Save changes</button>
       </div>
       </form>
     </div>
@@ -272,5 +253,3 @@ $(document).ready(function() {
 </script>
 
 {% endblock %}
-
-

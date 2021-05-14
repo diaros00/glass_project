@@ -136,12 +136,27 @@ def collector(request):
 
 
 def choose_defect_on_glass(request):
-    # datepick = request.POST['datepicker']
+    data_defect = Defect.objects.all()
+
+    datepick = request.POST['datepicker']
     shift = request.POST['shift']
-       
+
+    inputModelDesc = request.POST['inputModelDesc']
+
+    # filter โดย ID ของ modelGlass แล้วมาเก็บใน objModelDesc โดยดึง ทั้งแถวมาเลย
+    objModelDesc = modelGlass.objects.get(id=inputModelDesc)
+
+        
     # data_defect = Defect.objects.all()
     # data_glass = modelGlass.objects.all()
   
-    return render(request,'choose_defect_on_glass.html',{'shift':shift })
+
+    # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
+    return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+    'inputModelDesc':objModelDesc.model_desc,
+    'inputModelName':objModelDesc.model_name,
+    'inputModelCode':objModelDesc.model_code,
+    'inputModelImage':objModelDesc.model_image,
+    'defects':data_defect })
 
 

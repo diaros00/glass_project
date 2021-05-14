@@ -1,67 +1,632 @@
 {% extends 'layout.html' %} {% block content %}
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<div class="row">
-    <div class="col col-md-2">
-        <div style="margin-top: 2rem">
-            <a class="btn btn-outline-success btn-lg" href="/collector">back to collector</a
-      >
+<div class="container">
+    <div class="row">
+        <div class="col col-md-2">
+            <div style="margin: 2rem 2rem 0rem 2rem; ">
+                <a class="btn btn-outline-success btn-lg" href="/collector">
+                    <i class="fas fa-arrow-alt-circle-left"></i></i> Back</a>
+            </div>
+        </div>
+
+        <div class="col col-md-10">
+            <div class="card text-dark bg-light" style="margin-top: 2rem" ">
+                <div class="card-header text-success ">
+
+                    <h4>work on with</h4>
+
+                </div>
+                <div class="card-body ">
+
+
+                    <div class="row ">
+                        
+                   
+
+                            <table id="example1 " class="table table-striped " style="width:100% ">
+                                <thead>
+                                    <tr style="font-weight:bold; ">
+                                        <th scope="col ">Name Operator</th>
+                                        <th scope="col ">Model Code</th>
+                                        <th scope="col ">Model Name</th>
+                                        <th scope="col ">Model description</th>
+                                        <th scope="col ">Date</th>
+                                        <th scope="col ">Shift</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                    <tr>
+                                        <th scope="row ">{{user.first_name}}</th>
+                                        <td>{{inputModelCode}}</td>
+                                        <td>{{inputModelName}}</td>
+                                        <td>{{inputModelDesc}}</td>
+                                        <td>{{datepick}}</td>
+                                        <td>{{shift}}</td>
+
+                                    </tr>
+
+                                </tbody>
+                            </table>
+                    </div>
+
+                </div>
+            </div>
+
+        <div class="row " style="margin-top: 1rem; ">
+            <h4>Please , Choose point of defect on Glass.</h4>
+        </div>
+             
+       
+        <div class="row " style="margin-top: 1rem; background-image: url( '..{{inputModelImage}}'); background-position: center; background-repeat: no-repeat; background-size: cover; height: 600px; width: 800px; ">
+          <div class="row " style="padding: 1rem; " >
+            <div class="col col-3 "><button  class="btn btn-success text-center" data-toggle="modal" data-target=".myModal1" style="width: 10rem ; height: 7rem; text-align: center; ">Point 1</button></div>
+            <div class="col col-3 "><button  class="btn btn-success text-center" data-toggle="modal" data-target=".myModal2" style="width: 10rem ; height: 7rem; text-align: center; ">Point 2</button></div>
+            <div class="col col-3 "><button  class="btn btn-success text-center" data-toggle="modal" data-target=".myModal3" style="width: 10rem ; height: 7rem; text-align: center; ">Point 3</button></div>
+            <div class="col col-3 "><button  class="btn btn-success text-center" data-toggle="modal" data-target=".myModal4" style="width: 10rem ; height: 7rem; text-align: center; ">Point 4</button></div>
+          
+
+          
+          </div>
+          <div class="row " style="padding: 1rem; ">
+            <div class="col col-3 "><button  class="btn btn-success text-center" data-toggle="modal" data-target=".myModal5" style="width: 10rem ; height: 7rem; text-align: center; ">Point 5</button></div>
+            <div class="col col-3 "><button  class="btn btn-success text-center" data-toggle="modal" data-target=".myModal6" style="width: 10rem ; height: 7rem; text-align: center; ">Point 6</button></div>
+            <div class="col col-3 "><button  class="btn btn-success text-center" data-toggle="modal" data-target=".myModal7" style="width: 10rem ; height: 7rem; text-align: center; ">Point 7</button></div>
+            <div class="col col-3 "><button  class="btn btn-success text-center" data-toggle="modal" data-target=".myModal8" style="width: 10rem ; height: 7rem; text-align: center; ">Point 8</button></div>
+          
+          
+          
+         
+        </div>
+        <div class="row " style="padding: 1rem; ">
+            <div class="col col-3 "><button  class="btn btn-success text-center " data-toggle="modal" data-target=".myModal9" style="width: 10rem ; height: 7rem; text-align: center; ">Point 9</button></div>
+            <div class="col col-3 "><button  class="btn btn-success text-center " data-toggle="modal" data-target=".myModal10" style="width: 10rem ; height: 7rem; text-align: center; ">Point 10</button></div>
+            <div class="col col-3 "><button  class="btn btn-success text-center " data-toggle="modal" data-target=".myModal11" style="width: 10rem ; height: 7rem; text-align: center; ">Point 11</button></div>
+            <div class="col col-3 "><button  class="btn btn-success text-center " data-toggle="modal" data-target=".myModal12" style="width: 10rem ; height: 7rem; text-align: center; ">Point 12</button></div>
+        </div>
+
+           
+        </div>
+
+      </div>
+    </div>
+</div>
+
+
+
+
+<!-- Modal -->
+<div class="modal fade myModal1" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Please , Choose Defect.</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row" style="margin-top: 1rem">
+                    <div class="input-group mb-3">
+                      <label class="input-group-text" for="inputDefect"
+                        >Defect</label
+                      >
+                      <select  
+                        class="form-select"
+                        id="inputDefect"
+                        name="inputDefect"
+                      >
+                        <option selected>กรุณาเลือก defect</option>
+
+                        {% for defect in defects %}
+
+                        <option value="{{defect.id}}">
+                          {{defect.defect_name}}
+                        </option>
+
+                        {% endfor %}
+                      </select>
+                    </div>
+                  </div>
+      </div>
+       
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-danger" data-dismiss="modal">
+          <i class="fas fa-times-circle"></i> Close
+        </button>
+        <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Save changes</button>
+      </div>
     </div>
   </div>
-
-  <div class="col col-md-8" style="margin-top: 2rem">
-    <div class="card text-dark bg-light" style="max-width: 80rem; ">
-  <div class="card-header text-success">
-
-  <h4>รายชื่อ Model ทั้งหมด</h4>
-
-  </div>
-    <div class="card-body ">
-
-
-  <div class="row">
-    {% comment %} <table class="table table-light table-striped "> {% endcomment %}
-
-   <table id="example1" class="table table-striped" style="width:100%">
-      <thead>
-        <tr style="font-weight:bold;">
-          <th scope="col">Name Operator</th>
-          <th scope="col">Model Code</th>
-          <th scope="col">Model Name</th>
-          <th scope="col">Model description</th>
-          <th scope="col">Date</th>
-          <th scope="col">Shift</th>
-        </tr>
-      </thead>
-      <tbody>
-    
-        <tr>
-          <th scope="row">asdf</th>
-          <td>te</td>
-          <td>tes</td>
-          <td>table-striped</td>
-          <td>{{datepick}}</td>
-          <td>{{shift}}</td>
-          
-        </tr>
-       
-      </tbody>
-    </table>
-  </div>
-  
-</div>
 </div>
 
-    <h2>Please ,choose defect .</h2>
-    <div
-      class="d-flex justify-content-center"
-      style="
-        background-image: url('../media/a001.jpg');
 
-        width: 550px;
-        height: 550px;
-      "
-    ></div>
+<div class="modal fade myModal2" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Please , Choose Defect.</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row" style="margin-top: 1rem">
+                    <div class="input-group mb-3">
+                      <label class="input-group-text" for="inputDefect"
+                        >Defect</label
+                      >
+                      <select  
+                        class="form-select"
+                        id="inputDefect"
+                        name="inputDefect"
+                      >
+                        <option selected>กรุณาเลือก defect</option>
+
+                        {% for defect in defects %}
+
+                        <option value="{{defect.id}}">
+                          {{defect.defect_name}}
+                        </option>
+
+                        {% endfor %}
+                      </select>
+                    </div>
+                  </div>
+      </div>
+        
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-danger" data-dismiss="modal">
+          <i class="fas fa-times-circle"></i> Close
+        </button>
+        <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Save changes</button>
+      </div>
+    </div>
   </div>
 </div>
+
+<div class="modal fade myModal3" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Please , Choose Defect.</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row" style="margin-top: 1rem">
+                    <div class="input-group mb-3">
+                      <label class="input-group-text" for="inputDefect"
+                        >Defect</label
+                      >
+                      <select  
+                        class="form-select"
+                        id="inputDefect"
+                        name="inputDefect"
+                      >
+                        <option selected>กรุณาเลือก defect</option>
+
+                        {% for defect in defects %}
+
+                        <option value="{{defect.id}}">
+                          {{defect.defect_name}}
+                        </option>
+
+                        {% endfor %}
+                      </select>
+                    </div>
+                  </div>
+      </div>
+        
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-danger" data-dismiss="modal">
+          <i class="fas fa-times-circle"></i> Close
+        </button>
+        <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade myModal4" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Please , Choose Defect.</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row" style="margin-top: 1rem">
+                    <div class="input-group mb-3">
+                      <label class="input-group-text" for="inputDefect"
+                        >Defect</label
+                      >
+                      <select  
+                        class="form-select"
+                        id="inputDefect"
+                        name="inputDefect"
+                      >
+                        <option selected>กรุณาเลือก defect</option>
+
+                        {% for defect in defects %}
+
+                        <option value="{{defect.id}}">
+                          {{defect.defect_name}}
+                        </option>
+
+                        {% endfor %}
+                      </select>
+                    </div>
+                  </div>
+      </div>
+        
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-danger" data-dismiss="modal">
+          <i class="fas fa-times-circle"></i> Close
+        </button>
+        <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade myModal5" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Please , Choose Defect.</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row" style="margin-top: 1rem">
+                    <div class="input-group mb-3">
+                      <label class="input-group-text" for="inputDefect"
+                        >Defect</label
+                      >
+                      <select  
+                        class="form-select"
+                        id="inputDefect"
+                        name="inputDefect"
+                      >
+                        <option selected>กรุณาเลือก defect</option>
+
+                        {% for defect in defects %}
+
+                        <option value="{{defect.id}}">
+                          {{defect.defect_name}}
+                        </option>
+
+                        {% endfor %}
+                      </select>
+                    </div>
+                  </div>
+      </div>
+        
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-danger" data-dismiss="modal">
+          <i class="fas fa-times-circle"></i> Close
+        </button>
+        <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade myModal6" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Please , Choose Defect.</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row" style="margin-top: 1rem">
+                    <div class="input-group mb-3">
+                      <label class="input-group-text" for="inputDefect"
+                        >Defect</label
+                      >
+                      <select  
+                        class="form-select"
+                        id="inputDefect"
+                        name="inputDefect"
+                      >
+                        <option selected>กรุณาเลือก defect</option>
+
+                        {% for defect in defects %}
+
+                        <option value="{{defect.id}}">
+                          {{defect.defect_name}}
+                        </option>
+
+                        {% endfor %}
+                      </select>
+                    </div>
+                  </div>
+      </div>
+        
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-danger" data-dismiss="modal">
+          <i class="fas fa-times-circle"></i> Close
+        </button>
+        <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade myModal7" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Please , Choose Defect.</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row" style="margin-top: 1rem">
+                    <div class="input-group mb-3">
+                      <label class="input-group-text" for="inputDefect"
+                        >Defect</label
+                      >
+                      <select  
+                        class="form-select"
+                        id="inputDefect"
+                        name="inputDefect"
+                      >
+                        <option selected>กรุณาเลือก defect</option>
+
+                        {% for defect in defects %}
+
+                        <option value="{{defect.id}}">
+                          {{defect.defect_name}}
+                        </option>
+
+                        {% endfor %}
+                      </select>
+                    </div>
+                  </div>
+      </div>
+        
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-danger" data-dismiss="modal">
+          <i class="fas fa-times-circle"></i> Close
+        </button>
+        <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade myModal8" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Please , Choose Defect.</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row" style="margin-top: 1rem">
+                    <div class="input-group mb-3">
+                      <label class="input-group-text" for="inputDefect"
+                        >Defect</label
+                      >
+                      <select  
+                        class="form-select"
+                        id="inputDefect"
+                        name="inputDefect"
+                      >
+                        <option selected>กรุณาเลือก defect</option>
+
+                        {% for defect in defects %}
+
+                        <option value="{{defect.id}}">
+                          {{defect.defect_name}}
+                        </option>
+
+                        {% endfor %}
+                      </select>
+                    </div>
+                  </div>
+      </div>
+        
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-danger" data-dismiss="modal">
+          <i class="fas fa-times-circle"></i> Close
+        </button>
+        <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade myModal9" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Please , Choose Defect.</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row" style="margin-top: 1rem">
+                    <div class="input-group mb-3">
+                      <label class="input-group-text" for="inputDefect"
+                        >Defect</label
+                      >
+                      <select  
+                        class="form-select"
+                        id="inputDefect"
+                        name="inputDefect"
+                      >
+                        <option selected>กรุณาเลือก defect</option>
+
+                        {% for defect in defects %}
+
+                        <option value="{{defect.id}}">
+                          {{defect.defect_name}}
+                        </option>
+
+                        {% endfor %}
+                      </select>
+                    </div>
+                  </div>
+      </div>
+        
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-danger" data-dismiss="modal">
+          <i class="fas fa-times-circle"></i> Close
+        </button>
+        <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade myModal10" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Please , Choose Defect.</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row" style="margin-top: 1rem">
+                    <div class="input-group mb-3">
+                      <label class="input-group-text" for="inputDefect"
+                        >Defect</label
+                      >
+                      <select  
+                        class="form-select"
+                        id="inputDefect"
+                        name="inputDefect"
+                      >
+                        <option selected>กรุณาเลือก defect</option>
+
+                        {% for defect in defects %}
+
+                        <option value="{{defect.id}}">
+                          {{defect.defect_name}}
+                        </option>
+
+                        {% endfor %}
+                      </select>
+                    </div>
+                  </div>
+      </div>
+        
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-danger" data-dismiss="modal">
+          <i class="fas fa-times-circle"></i> Close
+        </button>
+        <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade myModal11" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Please , Choose Defect.</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row" style="margin-top: 1rem">
+                    <div class="input-group mb-3">
+                      <label class="input-group-text" for="inputDefect"
+                        >Defect</label
+                      >
+                      <select  
+                        class="form-select"
+                        id="inputDefect"
+                        name="inputDefect"
+                      >
+                        <option selected>กรุณาเลือก defect</option>
+
+                        {% for defect in defects %}
+
+                        <option value="{{defect.id}}">
+                          {{defect.defect_name}}
+                        </option>
+
+                        {% endfor %}
+                      </select>
+                    </div>
+                  </div>
+      </div>
+        
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-danger" data-dismiss="modal">
+          <i class="fas fa-times-circle"></i> Close
+        </button>
+        <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal fade myModal12" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Please , Choose Defect.</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row" style="margin-top: 1rem">
+                    <div class="input-group mb-3">
+                      <label class="input-group-text" for="inputDefect"
+                        >Defect</label
+                      >
+                      <select  
+                        class="form-select"
+                        id="inputDefect"
+                        name="inputDefect"
+                      >
+                        <option selected>กรุณาเลือก defect</option>
+
+                        {% for defect in defects %}
+
+                        <option value="{{defect.id}}">
+                          {{defect.defect_name}}
+                        </option>
+
+                        {% endfor %}
+                      </select>
+                    </div>
+                  </div>
+      </div>
+        
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-danger" data-dismiss="modal">
+          <i class="fas fa-times-circle"></i> Close
+        </button>
+        <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 
 {% endblock %}
