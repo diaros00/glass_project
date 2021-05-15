@@ -137,26 +137,59 @@ def collector(request):
 
 def choose_defect_on_glass(request):
     data_defect = Defect.objects.all()
-
     datepick = request.POST['datepicker']
     shift = request.POST['shift']
-
     inputModelDesc = request.POST['inputModelDesc']
-
     # filter โดย ID ของ modelGlass แล้วมาเก็บใน objModelDesc โดยดึง ทั้งแถวมาเลย
     objModelDesc = modelGlass.objects.get(id=inputModelDesc)
 
-        
     # data_defect = Defect.objects.all()
     # data_glass = modelGlass.objects.all()
-  
-
     # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
+
+   
+
     return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
     'inputModelDesc':objModelDesc.model_desc,
     'inputModelName':objModelDesc.model_name,
     'inputModelCode':objModelDesc.model_code,
     'inputModelImage':objModelDesc.model_image,
-    'defects':data_defect })
+    'defects':data_defect})
+
+def add_defect(request):
+    
+    data_defect = Defect.objects.all()
+
+    datepick = request.POST['datepick']
+    shift = request.POST['shift']
+
+    inputModelDesc = request.POST['inputModelDesc']
+    inputModelName = request.POST['inputModelName']
+    inputModelCode = request.POST['inputModelCode']
+    inputModelImage = request.POST['inputModelImage']
+    inputDefectP11 = request.POST['inputDefectP11']
+    inputDefectP12 = request.POST['inputDefectP12']
+    objModeldefect = Defect.objects.get(id=inputDefectP12)
+    
+
+    # data_defect = Defect.objects.all()
+    # data_glass = modelGlass.objects.all()
+
+    # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
+    messages.success(request,'Add defect > ' + objModeldefect.defect_name + ' < in model > ' + inputModelCode + ' < successfully.')
+    return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+    'inputModelDesc':inputModelDesc,
+    'inputModelName':inputModelDesc,
+    'inputModelCode':inputModelCode,
+    'inputModelImage':inputModelImage,
+    'defects':data_defect,
+    'inputDefectP12_return':objModeldefect.defect_name })
+
+    
+
+    
+
+
+
 
 

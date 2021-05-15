@@ -79,24 +79,23 @@ WSGI_APPLICATION = 'glass_project.wsgi.application'
 DATABASES = {
     'default': {
         # for macbook
-        'ENGINE': 'django.db.backends.mysql', 
-        'NAME': 'djangodb',
-        'USER': 'jo',
-        'PASSWORD': 'jo',
-        'HOST': '192.168.64.2',
-        'PORT': '3306',
+        # 'ENGINE': 'django.db.backends.mysql', 
+        # 'NAME': 'djangodb',
+        # 'USER': 'jo',
+        # 'PASSWORD': 'jo',
+        # 'HOST': '192.168.64.2',
+        # 'PORT': '3306',
 
 
         # for window
-        # 'ENGINE': 'django.db.backends.mysql', 
-        # 'NAME': 'djangodb',
-        # # 'NAME': 'glass_project',
-        # 'USER': 'adminjo',
-        # 'PASSWORD': 'itpwd8501',
+        'ENGINE': 'django.db.backends.mysql', 
+        'NAME': 'glass_project',
+        'USER': 'adminjo',
+        'PASSWORD': 'itpwd8501',
 
         # on host mk.jsr.co.th
-        # 'HOST': '200.1.1.52',
-        # 'PORT': '3307',
+        'HOST': '200.1.1.52',
+        'PORT': '3307',
 
 
         # for window and server is on host open

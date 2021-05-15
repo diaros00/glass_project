@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
+from datetime import datetime
+
 
 
 
@@ -23,6 +25,21 @@ class modelGlass(models.Model):
 
     def __str__(self):
         return self.model_name + ": " + str(self.model_image)
+
+class modelGlassWithDefect(models.Model):
+    
+    date_create = models.DateTimeField(default=datetime.now, blank=True)
+
+    model_code = models.CharField(max_length=200)
+    model_name = models.CharField(max_length=200)
+    model_desc = models.CharField(max_length=200,null=True)
+    defect_name = models.CharField(max_length=200)
+    date_select = models.DateField()
+    shift = models.CharField(max_length=200)
+    department = models.CharField(max_length=200)
+    
+
+    
  
 
 

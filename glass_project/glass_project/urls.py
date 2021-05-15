@@ -33,7 +33,7 @@ urlpatterns = [
     path('logout',views.logout),
     path('collector',views.collector),
     path('choose_defect_on_glass',views.choose_defect_on_glass),
-
+    path('add_defect',views.add_defect),
  
 
 ] 
