@@ -1,11 +1,14 @@
 from django.shortcuts import render,redirect
-from .models import Defect , modelGlass
+from .models import Defect , modelGlass , modelGlassWithDefect
 from django.contrib.auth.models import User,auth
 from django.contrib import messages
 from .models import UserProfile
 from django.core.files.storage import FileSystemStorage
 
 
+
+counter = 0
+datepick_for_check = 0
 
 
 def hello(request):
@@ -136,8 +139,22 @@ def collector(request):
 
 
 def choose_defect_on_glass(request):
+    global counter
+    global datepick_for_check
+   
+
+    
     data_defect = Defect.objects.all()
     datepick = request.POST['datepicker']
+
+    if datepick != datepick_for_check :
+        counter = 0
+       
+
+    datepick_for_check = datepick
+
+    
+    
     shift = request.POST['shift']
     inputModelDesc = request.POST['inputModelDesc']
     # filter โดย ID ของ modelGlass แล้วมาเก็บใน objModelDesc โดยดึง ทั้งแถวมาเลย
@@ -154,22 +171,125 @@ def choose_defect_on_glass(request):
     'inputModelName':objModelDesc.model_name,
     'inputModelCode':objModelDesc.model_code,
     'inputModelImage':objModelDesc.model_image,
-    'defects':data_defect})
+    'defects':data_defect,
+    'counter':counter })
 
-def add_defect(request):
+
+def add_have_defect(request):
+    global counter
+    global datepick_for_check
     
     data_defect = Defect.objects.all()
-
+    department = request.POST['department']
     datepick = request.POST['datepick']
+
+    if datepick == datepick_for_check :
+        counter += 1
+    else:
+        counter = 1
+        
     shift = request.POST['shift']
+    status_glass = request.POST['status_glass']
+    inputModelDesc = request.POST['inputModelDesc']
+    inputModelName = request.POST['inputModelName']
+    inputModelCode = request.POST['inputModelCode']
+    inputModelImage = request.POST['inputModelImage']
+
+     
+    messages.success(request,'Add defect in model > ' + inputModelCode + ' < successfully.')
+    return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+    'inputModelDesc':inputModelDesc,
+    'inputModelName':inputModelName,
+    'inputModelCode':inputModelCode,
+    'inputModelImage':inputModelImage,
+    'defects':data_defect,
+    'counter':counter})
+
+def add_no_defect(request):
+    global counter
+    global datepick_for_check
+    
+    data_defect = Defect.objects.all()
+    department = request.POST['department']
+    datepick = request.POST['datepick']
+
+    if datepick == datepick_for_check :
+        counter += 1
+    else:
+        counter = 1
+        
+
+    shift = request.POST['shift']
+    status_glass = request.POST['status_glass']
+    
 
     inputModelDesc = request.POST['inputModelDesc']
     inputModelName = request.POST['inputModelName']
     inputModelCode = request.POST['inputModelCode']
     inputModelImage = request.POST['inputModelImage']
-    inputDefectP11 = request.POST['inputDefectP11']
-    inputDefectP12 = request.POST['inputDefectP12']
-    objModeldefect = Defect.objects.get(id=inputDefectP12)
+
+
+    modelGlassWithDefect_add = modelGlassWithDefect.objects.create(
+                                        date_select = datepick,
+                                        shift = shift,
+                                        model_desc = inputModelDesc,
+                                        model_name = inputModelName,
+                                        model_code = inputModelCode,
+                                        department = department,
+                                        number_glass = counter,
+                                        status_glass = status_glass
+                                                                                
+                                )
+    modelGlassWithDefect_add.save()
+    
+
+    # data_defect = Defect.objects.all()
+    # data_glass = modelGlass.objects.all()
+
+    # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
+    messages.success(request,'Add No defect in model > ' + inputModelCode + ' < successfully.')
+    return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+    'inputModelDesc':inputModelDesc,
+    'inputModelName':inputModelName,
+    'inputModelCode':inputModelCode,
+    'inputModelImage':inputModelImage,
+    'defects':data_defect,
+    'counter':counter})
+
+def add_defect1(request):
+    global counter
+
+    point_defect = 1
+    data_defect = Defect.objects.all()
+    department = request.POST['department']
+
+    datepick = request.POST['datepick']
+    shift = request.POST['shift']
+    status_glass = request.POST['status_glass']
+    
+
+    inputModelDesc = request.POST['inputModelDesc']
+    inputModelName = request.POST['inputModelName']
+    inputModelCode = request.POST['inputModelCode']
+    inputModelImage = request.POST['inputModelImage']
+    inputDefectP1_box1_defect1 = request.POST['inputDefectP1_box1_defect1']
+    
+    objModeldefect = Defect.objects.get(id=inputDefectP1_box1_defect1)
+
+
+    modelGlassWithDefect_add = modelGlassWithDefect.objects.create(
+                                        date_select = datepick,
+                                        shift = shift,
+                                        model_desc = inputModelDesc,
+                                        model_name = inputModelName,
+                                        model_code = inputModelCode,
+                                        department = department,
+                                        status_glass = status_glass,
+                                        number_glass = counter,
+                                        defect_name1 = objModeldefect.defect_name
+                                        
+                                )
+    modelGlassWithDefect_add.save()
     
 
     # data_defect = Defect.objects.all()
@@ -179,11 +299,3346 @@ def add_defect(request):
     messages.success(request,'Add defect > ' + objModeldefect.defect_name + ' < in model > ' + inputModelCode + ' < successfully.')
     return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
     'inputModelDesc':inputModelDesc,
-    'inputModelName':inputModelDesc,
+    'inputModelName':inputModelName,
     'inputModelCode':inputModelCode,
     'inputModelImage':inputModelImage,
     'defects':data_defect,
-    'inputDefectP12_return':objModeldefect.defect_name })
+    'counter':counter})
+
+def add_defect2(request):
+    
+    
+    point_defect = 1
+    data_defect = Defect.objects.all()
+    department = request.POST['department']
+
+    datepick = request.POST['datepick']
+    shift = request.POST['shift']
+    status_glass = request.POST['status_glass']
+    
+    
+
+    inputModelDesc = request.POST['inputModelDesc']
+    inputModelName = request.POST['inputModelName']
+    inputModelCode = request.POST['inputModelCode']
+    inputModelImage = request.POST['inputModelImage']
+    inputDefectP1_box2_defect1 = request.POST['inputDefectP1_box2_defect1']
+    inputDefectP1_box2_defect2 = request.POST['inputDefectP1_box2_defect2']
+    
+    
+    objModeldefect1 = Defect.objects.get(id=inputDefectP1_box2_defect1)
+    objModeldefect2 = Defect.objects.get(id=inputDefectP1_box2_defect2)
+
+
+    modelGlassWithDefect_add = modelGlassWithDefect.objects.create(
+
+                                        date_select = datepick,
+                                        point_defect = point_defect,
+                                        shift = shift,
+                                        model_desc = inputModelDesc,
+                                        model_name = inputModelName,
+                                        model_code = inputModelCode,
+                                        department = department,
+                                        status_glass = status_glass,
+                                        number_glass = counter,
+                                        defect_name1 = objModeldefect1.defect_name,
+                                        defect_name2 = objModeldefect2.defect_name
+                                )
+    modelGlassWithDefect_add.save()
+    
+
+    # data_defect = Defect.objects.all()
+    # data_glass = modelGlass.objects.all()
+
+    # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
+    messages.success(request,'Add defect > ' + objModeldefect1.defect_name + ',' + objModeldefect2.defect_name + ' < in model > ' + inputModelCode + ' < successfully.')
+    return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+    'inputModelDesc':inputModelDesc,
+    'inputModelName':inputModelName,
+    'inputModelCode':inputModelCode,
+    'inputModelImage':inputModelImage,
+    'defects':data_defect,
+    'counter':counter})
+
+def add_defect3(request):
+    
+    point_defect = 1
+    data_defect = Defect.objects.all()
+    department = request.POST['department']
+
+    datepick = request.POST['datepick']
+    shift = request.POST['shift']
+    status_glass = request.POST['status_glass']
+    
+    
+
+    inputModelDesc = request.POST['inputModelDesc']
+    inputModelName = request.POST['inputModelName']
+    inputModelCode = request.POST['inputModelCode']
+    inputModelImage = request.POST['inputModelImage']
+    inputDefectP1_box3_defect1 = request.POST['inputDefectP1_box3_defect1']
+    inputDefectP1_box3_defect2 = request.POST['inputDefectP1_box3_defect2']
+    inputDefectP1_box3_defect3 = request.POST['inputDefectP1_box3_defect3']
+    
+    
+    objModeldefect1 = Defect.objects.get(id=inputDefectP1_box3_defect1)
+    objModeldefect2 = Defect.objects.get(id=inputDefectP1_box3_defect2)
+    objModeldefect3 = Defect.objects.get(id=inputDefectP1_box3_defect3)
+
+    modelGlassWithDefect_add = modelGlassWithDefect.objects.create(
+                                        date_select = datepick,
+                                        point_defect = point_defect,
+                                        shift = shift,
+                                        model_desc = inputModelDesc,
+                                        model_name = inputModelName,
+                                        model_code = inputModelCode,
+                                        department = department,
+                                        status_glass = status_glass,
+                                        number_glass = counter,
+                                        defect_name1 = objModeldefect1.defect_name,
+                                        defect_name2 = objModeldefect2.defect_name,
+                                        defect_name3 = objModeldefect3.defect_name
+                                )
+    modelGlassWithDefect_add.save()
+    
+
+    # data_defect = Defect.objects.all()
+    # data_glass = modelGlass.objects.all()
+
+    # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
+    messages.success(request,'Add defect > ' + objModeldefect1.defect_name + ',' + objModeldefect2.defect_name + ',' + objModeldefect3.defect_name + ' < in model > ' + inputModelCode + ' < successfully.')
+    return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+    'inputModelDesc':inputModelDesc,
+    'inputModelName':inputModelName,
+    'inputModelCode':inputModelCode,
+    'inputModelImage':inputModelImage,
+    'defects':data_defect,
+    'counter':counter})
+
+def add_defect4(request):
+    
+    point_defect = 1
+    data_defect = Defect.objects.all()
+    department = request.POST['department']
+
+    datepick = request.POST['datepick']
+    shift = request.POST['shift']
+    status_glass = request.POST['status_glass']
+    
+    
+
+    inputModelDesc = request.POST['inputModelDesc']
+    inputModelName = request.POST['inputModelName']
+    inputModelCode = request.POST['inputModelCode']
+    inputModelImage = request.POST['inputModelImage']
+    inputDefectP1_box4_defect1 = request.POST['inputDefectP1_box4_defect1']
+    inputDefectP1_box4_defect2 = request.POST['inputDefectP1_box4_defect2']
+    inputDefectP1_box4_defect3 = request.POST['inputDefectP1_box4_defect3']
+    inputDefectP1_box4_defect4 = request.POST['inputDefectP1_box4_defect4']
+    
+    
+    objModeldefect1 = Defect.objects.get(id=inputDefectP1_box4_defect1)
+    objModeldefect2 = Defect.objects.get(id=inputDefectP1_box4_defect2)
+    objModeldefect3 = Defect.objects.get(id=inputDefectP1_box4_defect3)
+    objModeldefect4 = Defect.objects.get(id=inputDefectP1_box4_defect4)
+
+
+    modelGlassWithDefect_add = modelGlassWithDefect.objects.create(
+                                        date_select = datepick,
+                                        point_defect = point_defect,
+                                        shift = shift,
+                                        model_desc = inputModelDesc,
+                                        model_name = inputModelName,
+                                        model_code = inputModelCode,
+                                        department = department,
+                                        status_glass = status_glass,
+                                        number_glass = counter,
+                                        defect_name1 = objModeldefect1.defect_name,
+                                        defect_name2 = objModeldefect2.defect_name,
+                                        defect_name3 = objModeldefect3.defect_name,
+                                        defect_name4 = objModeldefect4.defect_name
+                                )
+    modelGlassWithDefect_add.save()
+    
+
+    # data_defect = Defect.objects.all()
+    # data_glass = modelGlass.objects.all()
+
+    # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
+    messages.success(request,'Add defect > ' + objModeldefect1.defect_name + ',' + objModeldefect2.defect_name + ',' + objModeldefect3.defect_name + ',' + objModeldefect4.defect_name + ' < in model > ' + inputModelCode + ' < successfully.')
+    return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+    'inputModelDesc':inputModelDesc,
+    'inputModelName':inputModelName,
+    'inputModelCode':inputModelCode,
+    'inputModelImage':inputModelImage,
+    'defects':data_defect,
+    'counter':counter})
+
+def add_defect5(request):
+    
+    point_defect = 1
+    data_defect = Defect.objects.all()
+    department = request.POST['department']
+
+    datepick = request.POST['datepick']
+    shift = request.POST['shift']
+    status_glass = request.POST['status_glass']
+    
+    
+
+    inputModelDesc = request.POST['inputModelDesc']
+    inputModelName = request.POST['inputModelName']
+    inputModelCode = request.POST['inputModelCode']
+    inputModelImage = request.POST['inputModelImage']
+    inputDefectP1_box5_defect1 = request.POST['inputDefectP1_box5_defect1']
+    inputDefectP1_box5_defect2 = request.POST['inputDefectP1_box5_defect2']
+    inputDefectP1_box5_defect3 = request.POST['inputDefectP1_box5_defect3']
+    inputDefectP1_box5_defect4 = request.POST['inputDefectP1_box5_defect4']
+    inputDefectP1_box5_defect5 = request.POST['inputDefectP1_box5_defect5']
+    
+    
+    objModeldefect1 = Defect.objects.get(id=inputDefectP1_box5_defect1)
+    objModeldefect2 = Defect.objects.get(id=inputDefectP1_box5_defect2)
+    objModeldefect3 = Defect.objects.get(id=inputDefectP1_box5_defect3)
+    objModeldefect4 = Defect.objects.get(id=inputDefectP1_box5_defect4)
+    objModeldefect5 = Defect.objects.get(id=inputDefectP1_box5_defect5)
+
+
+    modelGlassWithDefect_add = modelGlassWithDefect.objects.create(
+                                        date_select = datepick,
+                                        point_defect = point_defect,
+                                        shift = shift,
+                                        model_desc = inputModelDesc,
+                                        model_name = inputModelName,
+                                        model_code = inputModelCode,
+                                        department = department,
+                                        status_glass = status_glass,
+                                        number_glass = counter,
+                                        defect_name1 = objModeldefect1.defect_name,
+                                        defect_name2 = objModeldefect2.defect_name,
+                                        defect_name3 = objModeldefect3.defect_name,
+                                        defect_name4 = objModeldefect4.defect_name,
+                                        defect_name5 = objModeldefect5.defect_name
+                                )
+    modelGlassWithDefect_add.save()
+    
+
+    # data_defect = Defect.objects.all()
+    # data_glass = modelGlass.objects.all()
+
+    # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
+    messages.success(request,'Add defect > ' + objModeldefect1.defect_name + ',' + objModeldefect2.defect_name + ',' + objModeldefect3.defect_name + ',' + objModeldefect4.defect_name + ',' + objModeldefect5.defect_name + ' < in model > ' + inputModelCode + ' < successfully.')
+    return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+    'inputModelDesc':inputModelDesc,
+    'inputModelName':inputModelName,
+    'inputModelCode':inputModelCode,
+    'inputModelImage':inputModelImage,
+    'defects':data_defect,
+    'counter':counter})
+
+
+def add_defect6(request):
+    
+   
+    point_defect = 2
+    data_defect = Defect.objects.all()
+    department = request.POST['department']
+
+    datepick = request.POST['datepick']
+    shift = request.POST['shift']
+    status_glass = request.POST['status_glass']
+    
+    
+
+    inputModelDesc = request.POST['inputModelDesc']
+    inputModelName = request.POST['inputModelName']
+    inputModelCode = request.POST['inputModelCode']
+    inputModelImage = request.POST['inputModelImage']
+    inputDefectP2_box1_defect1 = request.POST['inputDefectP2_box1_defect1']
+    
+    objModeldefect = Defect.objects.get(id=inputDefectP2_box1_defect1)
+
+
+    modelGlassWithDefect_add = modelGlassWithDefect.objects.create(
+                                        date_select = datepick,
+                                        point_defect = point_defect,
+                                        shift = shift,
+                                        model_desc = inputModelDesc,
+                                        model_name = inputModelName,
+                                        model_code = inputModelCode,
+                                        department = department,
+                                        status_glass = status_glass,
+                                        number_glass = counter,
+                                        defect_name1 = objModeldefect.defect_name
+                                )
+    modelGlassWithDefect_add.save()
+    
+
+    # data_defect = Defect.objects.all()
+    # data_glass = modelGlass.objects.all()
+
+    # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
+    messages.success(request,'Add defect > ' + objModeldefect.defect_name + ' < in model > ' + inputModelCode + ' < successfully.')
+    return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+    'inputModelDesc':inputModelDesc,
+    'inputModelName':inputModelName,
+    'inputModelCode':inputModelCode,
+    'inputModelImage':inputModelImage,
+    'defects':data_defect,
+    'counter':counter})
+
+def add_defect7(request):
+    
+    point_defect = 2
+    data_defect = Defect.objects.all()
+    department = request.POST['department']
+
+    datepick = request.POST['datepick']
+    shift = request.POST['shift']
+    status_glass = request.POST['status_glass']
+    
+    
+
+    inputModelDesc = request.POST['inputModelDesc']
+    inputModelName = request.POST['inputModelName']
+    inputModelCode = request.POST['inputModelCode']
+    inputModelImage = request.POST['inputModelImage']
+    inputDefectP2_box2_defect1 = request.POST['inputDefectP2_box2_defect1']
+    inputDefectP2_box2_defect2 = request.POST['inputDefectP2_box2_defect2']
+    
+    
+    objModeldefect1 = Defect.objects.get(id=inputDefectP2_box2_defect1)
+    objModeldefect2 = Defect.objects.get(id=inputDefectP2_box2_defect2)
+
+
+    modelGlassWithDefect_add = modelGlassWithDefect.objects.create(
+                                        date_select = datepick,
+                                        point_defect = point_defect,
+                                        shift = shift,
+                                        model_desc = inputModelDesc,
+                                        model_name = inputModelName,
+                                        model_code = inputModelCode,
+                                        department = department,
+                                        status_glass = status_glass,
+                                        number_glass = counter,
+                                        defect_name1 = objModeldefect1.defect_name,
+                                        defect_name2 = objModeldefect2.defect_name
+                                )
+    modelGlassWithDefect_add.save()
+    
+
+    # data_defect = Defect.objects.all()
+    # data_glass = modelGlass.objects.all()
+
+    # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
+    messages.success(request,'Add defect > ' + objModeldefect1.defect_name + ',' + objModeldefect2.defect_name + ' < in model > ' + inputModelCode + ' < successfully.')
+    return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+    'inputModelDesc':inputModelDesc,
+    'inputModelName':inputModelName,
+    'inputModelCode':inputModelCode,
+    'inputModelImage':inputModelImage,
+    'defects':data_defect,
+    'counter':counter})
+
+def add_defect8(request):
+    
+    point_defect = 2
+    data_defect = Defect.objects.all()
+    department = request.POST['department']
+
+    datepick = request.POST['datepick']
+    shift = request.POST['shift']
+    status_glass = request.POST['status_glass']
+    
+    
+
+    inputModelDesc = request.POST['inputModelDesc']
+    inputModelName = request.POST['inputModelName']
+    inputModelCode = request.POST['inputModelCode']
+    inputModelImage = request.POST['inputModelImage']
+    inputDefectP2_box3_defect1 = request.POST['inputDefectP2_box3_defect1']
+    inputDefectP2_box3_defect2 = request.POST['inputDefectP2_box3_defect2']
+    inputDefectP2_box3_defect3 = request.POST['inputDefectP2_box3_defect3']
+    
+    
+    objModeldefect1 = Defect.objects.get(id=inputDefectP2_box3_defect1)
+    objModeldefect2 = Defect.objects.get(id=inputDefectP2_box3_defect2)
+    objModeldefect3 = Defect.objects.get(id=inputDefectP2_box3_defect3)
+
+    modelGlassWithDefect_add = modelGlassWithDefect.objects.create(
+                                        date_select = datepick,
+                                        point_defect = point_defect,
+                                        shift = shift,
+                                        model_desc = inputModelDesc,
+                                        model_name = inputModelName,
+                                        model_code = inputModelCode,
+                                        department = department,
+                                        status_glass = status_glass,
+                                        number_glass = counter,
+                                        defect_name1 = objModeldefect1.defect_name,
+                                        defect_name2 = objModeldefect2.defect_name,
+                                        defect_name3 = objModeldefect3.defect_name
+                                )
+    modelGlassWithDefect_add.save()
+    
+
+    # data_defect = Defect.objects.all()
+    # data_glass = modelGlass.objects.all()
+
+    # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
+    messages.success(request,'Add defect > ' + objModeldefect1.defect_name + ',' + objModeldefect2.defect_name + ',' + objModeldefect3.defect_name + ' < in model > ' + inputModelCode + ' < successfully.')
+    return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+    'inputModelDesc':inputModelDesc,
+    'inputModelName':inputModelName,
+    'inputModelCode':inputModelCode,
+    'inputModelImage':inputModelImage,
+    'defects':data_defect,
+    'counter':counter})
+
+def add_defect9(request):
+    
+    point_defect = 2
+    data_defect = Defect.objects.all()
+    department = request.POST['department']
+
+    datepick = request.POST['datepick']
+    shift = request.POST['shift']
+    status_glass = request.POST['status_glass']
+    
+    
+
+    inputModelDesc = request.POST['inputModelDesc']
+    inputModelName = request.POST['inputModelName']
+    inputModelCode = request.POST['inputModelCode']
+    inputModelImage = request.POST['inputModelImage']
+    inputDefectP2_box4_defect1 = request.POST['inputDefectP2_box4_defect1']
+    inputDefectP2_box4_defect2 = request.POST['inputDefectP2_box4_defect2']
+    inputDefectP2_box4_defect3 = request.POST['inputDefectP2_box4_defect3']
+    inputDefectP2_box4_defect4 = request.POST['inputDefectP2_box4_defect4']
+    
+    
+    objModeldefect1 = Defect.objects.get(id=inputDefectP2_box4_defect1)
+    objModeldefect2 = Defect.objects.get(id=inputDefectP2_box4_defect2)
+    objModeldefect3 = Defect.objects.get(id=inputDefectP2_box4_defect3)
+    objModeldefect4 = Defect.objects.get(id=inputDefectP2_box4_defect4)
+
+
+    modelGlassWithDefect_add = modelGlassWithDefect.objects.create(
+                                        date_select = datepick,
+                                        point_defect = point_defect,
+                                        shift = shift,
+                                        model_desc = inputModelDesc,
+                                        model_name = inputModelName,
+                                        model_code = inputModelCode,
+                                        department = department,
+                                        status_glass = status_glass,
+                                        number_glass = counter,
+                                        defect_name1 = objModeldefect1.defect_name,
+                                        defect_name2 = objModeldefect2.defect_name,
+                                        defect_name3 = objModeldefect3.defect_name,
+                                        defect_name4 = objModeldefect4.defect_name
+                                )
+    modelGlassWithDefect_add.save()
+    
+
+    # data_defect = Defect.objects.all()
+    # data_glass = modelGlass.objects.all()
+
+    # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
+    messages.success(request,'Add defect > ' + objModeldefect1.defect_name + ',' + objModeldefect2.defect_name + ',' + objModeldefect3.defect_name + ',' + objModeldefect4.defect_name + ' < in model > ' + inputModelCode + ' < successfully.')
+    return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+    'inputModelDesc':inputModelDesc,
+    'inputModelName':inputModelName,
+    'inputModelCode':inputModelCode,
+    'inputModelImage':inputModelImage,
+    'defects':data_defect,
+    'counter':counter})
+
+def add_defect10(request):
+    
+    point_defect = 2
+    data_defect = Defect.objects.all()
+    department = request.POST['department']
+
+    datepick = request.POST['datepick']
+    shift = request.POST['shift']
+    status_glass = request.POST['status_glass']
+    
+    
+
+    inputModelDesc = request.POST['inputModelDesc']
+    inputModelName = request.POST['inputModelName']
+    inputModelCode = request.POST['inputModelCode']
+    inputModelImage = request.POST['inputModelImage']
+    inputDefectP2_box5_defect1 = request.POST['inputDefectP2_box5_defect1']
+    inputDefectP2_box5_defect2 = request.POST['inputDefectP2_box5_defect2']
+    inputDefectP2_box5_defect3 = request.POST['inputDefectP2_box5_defect3']
+    inputDefectP2_box5_defect4 = request.POST['inputDefectP2_box5_defect4']
+    inputDefectP2_box5_defect5 = request.POST['inputDefectP2_box5_defect5']
+    
+    
+    objModeldefect1 = Defect.objects.get(id=inputDefectP2_box5_defect1)
+    objModeldefect2 = Defect.objects.get(id=inputDefectP2_box5_defect2)
+    objModeldefect3 = Defect.objects.get(id=inputDefectP2_box5_defect3)
+    objModeldefect4 = Defect.objects.get(id=inputDefectP2_box5_defect4)
+    objModeldefect5 = Defect.objects.get(id=inputDefectP2_box5_defect5)
+
+
+    modelGlassWithDefect_add = modelGlassWithDefect.objects.create(
+                                        date_select = datepick,
+                                        point_defect = point_defect,
+                                        shift = shift,
+                                        model_desc = inputModelDesc,
+                                        model_name = inputModelName,
+                                        model_code = inputModelCode,
+                                        department = department,
+                                        status_glass = status_glass,
+                                        number_glass = counter,
+                                        defect_name1 = objModeldefect1.defect_name,
+                                        defect_name2 = objModeldefect2.defect_name,
+                                        defect_name3 = objModeldefect3.defect_name,
+                                        defect_name4 = objModeldefect4.defect_name,
+                                        defect_name5 = objModeldefect5.defect_name
+                                )
+    modelGlassWithDefect_add.save()
+    
+
+    # data_defect = Defect.objects.all()
+    # data_glass = modelGlass.objects.all()
+
+    # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
+    messages.success(request,'Add defect > ' + objModeldefect1.defect_name + ',' + objModeldefect2.defect_name + ',' + objModeldefect3.defect_name + ',' + objModeldefect4.defect_name + ',' + objModeldefect5.defect_name + ' < in model > ' + inputModelCode + ' < successfully.')
+    return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+    'inputModelDesc':inputModelDesc,
+    'inputModelName':inputModelName,
+    'inputModelCode':inputModelCode,
+    'inputModelImage':inputModelImage,
+    'defects':data_defect,
+    'counter':counter})
+
+
+
+
+
+
+
+
+
+
+def add_defect11(request):
+    
+    point_defect = 3
+    data_defect = Defect.objects.all()
+    department = request.POST['department']
+
+    datepick = request.POST['datepick']
+    shift = request.POST['shift']
+    status_glass = request.POST['status_glass']
+    
+    
+
+    inputModelDesc = request.POST['inputModelDesc']
+    inputModelName = request.POST['inputModelName']
+    inputModelCode = request.POST['inputModelCode']
+    inputModelImage = request.POST['inputModelImage']
+    inputDefectP3_box1_defect1 = request.POST['inputDefectP3_box1_defect1']
+    
+    objModeldefect = Defect.objects.get(id=inputDefectP3_box1_defect1)
+
+
+    modelGlassWithDefect_add = modelGlassWithDefect.objects.create(
+                                        date_select = datepick,
+                                        point_defect = point_defect,
+                                        shift = shift,
+                                        model_desc = inputModelDesc,
+                                        model_name = inputModelName,
+                                        model_code = inputModelCode,
+                                        department = department,
+                                        status_glass = status_glass,
+                                        number_glass = counter,
+                                        defect_name1 = objModeldefect.defect_name
+                                )
+    modelGlassWithDefect_add.save()
+    
+
+    # data_defect = Defect.objects.all()
+    # data_glass = modelGlass.objects.all()
+
+    # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
+    messages.success(request,'Add defect > ' + objModeldefect.defect_name + ' < in model > ' + inputModelCode + ' < successfully.')
+    return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+    'inputModelDesc':inputModelDesc,
+    'inputModelName':inputModelName,
+    'inputModelCode':inputModelCode,
+    'inputModelImage':inputModelImage,
+    'defects':data_defect,
+    'counter':counter})
+
+def add_defect12(request):
+    
+    point_defect = 3
+    data_defect = Defect.objects.all()
+    department = request.POST['department']
+
+    datepick = request.POST['datepick']
+    shift = request.POST['shift']
+    status_glass = request.POST['status_glass']
+    
+    
+
+    inputModelDesc = request.POST['inputModelDesc']
+    inputModelName = request.POST['inputModelName']
+    inputModelCode = request.POST['inputModelCode']
+    inputModelImage = request.POST['inputModelImage']
+    inputDefectP3_box2_defect1 = request.POST['inputDefectP3_box2_defect1']
+    inputDefectP3_box2_defect2 = request.POST['inputDefectP3_box2_defect2']
+    
+    
+    objModeldefect1 = Defect.objects.get(id=inputDefectP3_box2_defect1)
+    objModeldefect2 = Defect.objects.get(id=inputDefectP3_box2_defect2)
+
+
+    modelGlassWithDefect_add = modelGlassWithDefect.objects.create(
+                                        date_select = datepick,
+                                        point_defect = point_defect,
+                                        shift = shift,
+                                        model_desc = inputModelDesc,
+                                        model_name = inputModelName,
+                                        model_code = inputModelCode,
+                                        department = department,
+                                        status_glass = status_glass,
+                                        number_glass = counter,
+                                        defect_name1 = objModeldefect1.defect_name,
+                                        defect_name2 = objModeldefect2.defect_name
+                                )
+    modelGlassWithDefect_add.save()
+    
+
+    # data_defect = Defect.objects.all()
+    # data_glass = modelGlass.objects.all()
+
+    # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
+    messages.success(request,'Add defect > ' + objModeldefect1.defect_name + ',' + objModeldefect2.defect_name + ' < in model > ' + inputModelCode + ' < successfully.')
+    return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+    'inputModelDesc':inputModelDesc,
+    'inputModelName':inputModelName,
+    'inputModelCode':inputModelCode,
+    'inputModelImage':inputModelImage,
+    'defects':data_defect,
+    'counter':counter})
+
+def add_defect13(request):
+    
+    point_defect = 3
+    data_defect = Defect.objects.all()
+    department = request.POST['department']
+
+    datepick = request.POST['datepick']
+    shift = request.POST['shift']
+    status_glass = request.POST['status_glass']
+    
+    
+
+    inputModelDesc = request.POST['inputModelDesc']
+    inputModelName = request.POST['inputModelName']
+    inputModelCode = request.POST['inputModelCode']
+    inputModelImage = request.POST['inputModelImage']
+    inputDefectP3_box3_defect1 = request.POST['inputDefectP3_box3_defect1']
+    inputDefectP3_box3_defect2 = request.POST['inputDefectP3_box3_defect2']
+    inputDefectP3_box3_defect3 = request.POST['inputDefectP3_box3_defect3']
+    
+    
+    objModeldefect1 = Defect.objects.get(id=inputDefectP3_box3_defect1)
+    objModeldefect2 = Defect.objects.get(id=inputDefectP3_box3_defect2)
+    objModeldefect3 = Defect.objects.get(id=inputDefectP3_box3_defect3)
+
+    modelGlassWithDefect_add = modelGlassWithDefect.objects.create(
+                                        date_select = datepick,
+                                        point_defect = point_defect,
+                                        shift = shift,
+                                        model_desc = inputModelDesc,
+                                        model_name = inputModelName,
+                                        model_code = inputModelCode,
+                                        department = department,
+                                        status_glass = status_glass,
+                                        number_glass = counter,
+                                        defect_name1 = objModeldefect1.defect_name,
+                                        defect_name2 = objModeldefect2.defect_name,
+                                        defect_name3 = objModeldefect3.defect_name
+                                )
+    modelGlassWithDefect_add.save()
+    
+
+    # data_defect = Defect.objects.all()
+    # data_glass = modelGlass.objects.all()
+
+    # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
+    messages.success(request,'Add defect > ' + objModeldefect1.defect_name + ',' + objModeldefect2.defect_name + ',' + objModeldefect3.defect_name + ' < in model > ' + inputModelCode + ' < successfully.')
+    return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+    'inputModelDesc':inputModelDesc,
+    'inputModelName':inputModelName,
+    'inputModelCode':inputModelCode,
+    'inputModelImage':inputModelImage,
+    'defects':data_defect,
+    'counter':counter})
+
+def add_defect14(request):
+    
+    point_defect = 3
+    data_defect = Defect.objects.all()
+    department = request.POST['department']
+
+    datepick = request.POST['datepick']
+    shift = request.POST['shift']
+    status_glass = request.POST['status_glass']
+    
+    
+
+    inputModelDesc = request.POST['inputModelDesc']
+    inputModelName = request.POST['inputModelName']
+    inputModelCode = request.POST['inputModelCode']
+    inputModelImage = request.POST['inputModelImage']
+    inputDefectP3_box4_defect1 = request.POST['inputDefectP3_box4_defect1']
+    inputDefectP3_box4_defect2 = request.POST['inputDefectP3_box4_defect2']
+    inputDefectP3_box4_defect3 = request.POST['inputDefectP3_box4_defect3']
+    inputDefectP3_box4_defect4 = request.POST['inputDefectP3_box4_defect4']
+    
+    
+    objModeldefect1 = Defect.objects.get(id=inputDefectP3_box4_defect1)
+    objModeldefect2 = Defect.objects.get(id=inputDefectP3_box4_defect2)
+    objModeldefect3 = Defect.objects.get(id=inputDefectP3_box4_defect3)
+    objModeldefect4 = Defect.objects.get(id=inputDefectP3_box4_defect4)
+
+
+    modelGlassWithDefect_add = modelGlassWithDefect.objects.create(
+                                        date_select = datepick,
+                                        point_defect = point_defect,
+                                        shift = shift,
+                                        model_desc = inputModelDesc,
+                                        model_name = inputModelName,
+                                        model_code = inputModelCode,
+                                        department = department,
+                                        status_glass = status_glass,
+                                        number_glass = counter,
+                                        defect_name1 = objModeldefect1.defect_name,
+                                        defect_name2 = objModeldefect2.defect_name,
+                                        defect_name3 = objModeldefect3.defect_name,
+                                        defect_name4 = objModeldefect4.defect_name
+                                )
+    modelGlassWithDefect_add.save()
+    
+
+    # data_defect = Defect.objects.all()
+    # data_glass = modelGlass.objects.all()
+
+    # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
+    messages.success(request,'Add defect > ' + objModeldefect1.defect_name + ',' + objModeldefect2.defect_name + ',' + objModeldefect3.defect_name + ',' + objModeldefect4.defect_name + ' < in model > ' + inputModelCode + ' < successfully.')
+    return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+    'inputModelDesc':inputModelDesc,
+    'inputModelName':inputModelName,
+    'inputModelCode':inputModelCode,
+    'inputModelImage':inputModelImage,
+    'defects':data_defect,
+    'counter':counter})
+
+def add_defect15(request):
+    
+    point_defect = 3
+    data_defect = Defect.objects.all()
+    department = request.POST['department']
+
+    datepick = request.POST['datepick']
+    shift = request.POST['shift']
+    status_glass = request.POST['status_glass']
+    
+    
+
+    inputModelDesc = request.POST['inputModelDesc']
+    inputModelName = request.POST['inputModelName']
+    inputModelCode = request.POST['inputModelCode']
+    inputModelImage = request.POST['inputModelImage']
+    inputDefectP3_box5_defect1 = request.POST['inputDefectP3_box5_defect1']
+    inputDefectP3_box5_defect2 = request.POST['inputDefectP3_box5_defect2']
+    inputDefectP3_box5_defect3 = request.POST['inputDefectP3_box5_defect3']
+    inputDefectP3_box5_defect4 = request.POST['inputDefectP3_box5_defect4']
+    inputDefectP3_box5_defect5 = request.POST['inputDefectP3_box5_defect5']
+    
+    
+    objModeldefect1 = Defect.objects.get(id=inputDefectP3_box5_defect1)
+    objModeldefect2 = Defect.objects.get(id=inputDefectP3_box5_defect2)
+    objModeldefect3 = Defect.objects.get(id=inputDefectP3_box5_defect3)
+    objModeldefect4 = Defect.objects.get(id=inputDefectP3_box5_defect4)
+    objModeldefect5 = Defect.objects.get(id=inputDefectP3_box5_defect5)
+
+
+    modelGlassWithDefect_add = modelGlassWithDefect.objects.create(
+                                        date_select = datepick,
+                                        point_defect = point_defect,
+                                        shift = shift,
+                                        model_desc = inputModelDesc,
+                                        model_name = inputModelName,
+                                        model_code = inputModelCode,
+                                        department = department,
+                                        status_glass = status_glass,
+                                        number_glass = counter,
+                                        defect_name1 = objModeldefect1.defect_name,
+                                        defect_name2 = objModeldefect2.defect_name,
+                                        defect_name3 = objModeldefect3.defect_name,
+                                        defect_name4 = objModeldefect4.defect_name,
+                                        defect_name5 = objModeldefect5.defect_name
+                                )
+    modelGlassWithDefect_add.save()
+    
+
+    # data_defect = Defect.objects.all()
+    # data_glass = modelGlass.objects.all()
+
+    # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
+    messages.success(request,'Add defect > ' + objModeldefect1.defect_name + ',' + objModeldefect2.defect_name + ',' + objModeldefect3.defect_name + ',' + objModeldefect4.defect_name + ',' + objModeldefect5.defect_name + ' < in model > ' + inputModelCode + ' < successfully.')
+    return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+    'inputModelDesc':inputModelDesc,
+    'inputModelName':inputModelName,
+    'inputModelCode':inputModelCode,
+    'inputModelImage':inputModelImage,
+    'defects':data_defect,
+    'counter':counter})
+
+
+
+
+
+
+def add_defect16(request):
+    
+    point_defect = 4
+    data_defect = Defect.objects.all()
+    department = request.POST['department']
+
+    datepick = request.POST['datepick']
+    shift = request.POST['shift']
+    status_glass = request.POST['status_glass']
+    
+    
+
+    inputModelDesc = request.POST['inputModelDesc']
+    inputModelName = request.POST['inputModelName']
+    inputModelCode = request.POST['inputModelCode']
+    inputModelImage = request.POST['inputModelImage']
+    inputDefectP4_box1_defect1 = request.POST['inputDefectP4_box1_defect1']
+    
+    objModeldefect = Defect.objects.get(id=inputDefectP4_box1_defect1)
+
+
+    modelGlassWithDefect_add = modelGlassWithDefect.objects.create(
+                                        date_select = datepick,
+                                        point_defect = point_defect,
+                                        shift = shift,
+                                        model_desc = inputModelDesc,
+                                        model_name = inputModelName,
+                                        model_code = inputModelCode,
+                                        department = department,
+                                        status_glass = status_glass,
+                                        number_glass = counter,
+                                        defect_name1 = objModeldefect.defect_name
+                                )
+    modelGlassWithDefect_add.save()
+    
+
+    # data_defect = Defect.objects.all()
+    # data_glass = modelGlass.objects.all()
+
+    # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
+    messages.success(request,'Add defect > ' + objModeldefect.defect_name + ' < in model > ' + inputModelCode + ' < successfully.')
+    return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+    'inputModelDesc':inputModelDesc,
+    'inputModelName':inputModelName,
+    'inputModelCode':inputModelCode,
+    'inputModelImage':inputModelImage,
+    'defects':data_defect,
+    'counter':counter})
+
+def add_defect17(request):
+    
+    point_defect = 4
+    data_defect = Defect.objects.all()
+    department = request.POST['department']
+
+    datepick = request.POST['datepick']
+    shift = request.POST['shift']
+    status_glass = request.POST['status_glass']
+    
+    
+
+    inputModelDesc = request.POST['inputModelDesc']
+    inputModelName = request.POST['inputModelName']
+    inputModelCode = request.POST['inputModelCode']
+    inputModelImage = request.POST['inputModelImage']
+    inputDefectP4_box2_defect1 = request.POST['inputDefectP4_box2_defect1']
+    inputDefectP4_box2_defect2 = request.POST['inputDefectP4_box2_defect2']
+    
+    
+    objModeldefect1 = Defect.objects.get(id=inputDefectP4_box2_defect1)
+    objModeldefect2 = Defect.objects.get(id=inputDefectP4_box2_defect2)
+
+
+    modelGlassWithDefect_add = modelGlassWithDefect.objects.create(
+                                        date_select = datepick,
+                                        point_defect = point_defect,
+                                        shift = shift,
+                                        model_desc = inputModelDesc,
+                                        model_name = inputModelName,
+                                        model_code = inputModelCode,
+                                        department = department,
+                                        status_glass = status_glass,
+                                        number_glass = counter,
+                                        defect_name1 = objModeldefect1.defect_name,
+                                        defect_name2 = objModeldefect2.defect_name
+                                )
+    modelGlassWithDefect_add.save()
+    
+
+    # data_defect = Defect.objects.all()
+    # data_glass = modelGlass.objects.all()
+
+    # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
+    messages.success(request,'Add defect > ' + objModeldefect1.defect_name + ',' + objModeldefect2.defect_name + ' < in model > ' + inputModelCode + ' < successfully.')
+    return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+    'inputModelDesc':inputModelDesc,
+    'inputModelName':inputModelName,
+    'inputModelCode':inputModelCode,
+    'inputModelImage':inputModelImage,
+    'defects':data_defect,
+    'counter':counter})
+
+def add_defect18(request):
+    
+    point_defect = 4
+    data_defect = Defect.objects.all()
+    department = request.POST['department']
+
+    datepick = request.POST['datepick']
+    shift = request.POST['shift']
+    status_glass = request.POST['status_glass']
+    
+    
+
+    inputModelDesc = request.POST['inputModelDesc']
+    inputModelName = request.POST['inputModelName']
+    inputModelCode = request.POST['inputModelCode']
+    inputModelImage = request.POST['inputModelImage']
+    inputDefectP4_box3_defect1 = request.POST['inputDefectP4_box3_defect1']
+    inputDefectP4_box3_defect2 = request.POST['inputDefectP4_box3_defect2']
+    inputDefectP4_box3_defect3 = request.POST['inputDefectP4_box3_defect3']
+    
+    
+    objModeldefect1 = Defect.objects.get(id=inputDefectP4_box3_defect1)
+    objModeldefect2 = Defect.objects.get(id=inputDefectP4_box3_defect2)
+    objModeldefect3 = Defect.objects.get(id=inputDefectP4_box3_defect3)
+
+    modelGlassWithDefect_add = modelGlassWithDefect.objects.create(
+                                        date_select = datepick,
+                                        point_defect = point_defect,
+                                        shift = shift,
+                                        model_desc = inputModelDesc,
+                                        model_name = inputModelName,
+                                        model_code = inputModelCode,
+                                        department = department,
+                                        status_glass = status_glass,
+                                        number_glass = counter,
+                                        defect_name1 = objModeldefect1.defect_name,
+                                        defect_name2 = objModeldefect2.defect_name,
+                                        defect_name3 = objModeldefect3.defect_name
+                                )
+    modelGlassWithDefect_add.save()
+    
+
+    # data_defect = Defect.objects.all()
+    # data_glass = modelGlass.objects.all()
+
+    # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
+    messages.success(request,'Add defect > ' + objModeldefect1.defect_name + ',' + objModeldefect2.defect_name + ',' + objModeldefect3.defect_name + ' < in model > ' + inputModelCode + ' < successfully.')
+    return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+    'inputModelDesc':inputModelDesc,
+    'inputModelName':inputModelName,
+    'inputModelCode':inputModelCode,
+    'inputModelImage':inputModelImage,
+    'defects':data_defect,
+    'counter':counter})
+
+def add_defect19(request):
+    
+    point_defect = 4
+    data_defect = Defect.objects.all()
+    department = request.POST['department']
+
+    datepick = request.POST['datepick']
+    shift = request.POST['shift']
+    status_glass = request.POST['status_glass']
+    
+    
+
+    inputModelDesc = request.POST['inputModelDesc']
+    inputModelName = request.POST['inputModelName']
+    inputModelCode = request.POST['inputModelCode']
+    inputModelImage = request.POST['inputModelImage']
+    inputDefectP4_box4_defect1 = request.POST['inputDefectP4_box4_defect1']
+    inputDefectP4_box4_defect2 = request.POST['inputDefectP4_box4_defect2']
+    inputDefectP4_box4_defect3 = request.POST['inputDefectP4_box4_defect3']
+    inputDefectP4_box4_defect4 = request.POST['inputDefectP4_box4_defect4']
+    
+    
+    objModeldefect1 = Defect.objects.get(id=inputDefectP4_box4_defect1)
+    objModeldefect2 = Defect.objects.get(id=inputDefectP4_box4_defect2)
+    objModeldefect3 = Defect.objects.get(id=inputDefectP4_box4_defect3)
+    objModeldefect4 = Defect.objects.get(id=inputDefectP4_box4_defect4)
+
+
+    modelGlassWithDefect_add = modelGlassWithDefect.objects.create(
+                                        date_select = datepick,
+                                        point_defect = point_defect,
+                                        shift = shift,
+                                        model_desc = inputModelDesc,
+                                        model_name = inputModelName,
+                                        model_code = inputModelCode,
+                                        department = department,
+                                        status_glass = status_glass,
+                                        number_glass = counter,
+                                        defect_name1 = objModeldefect1.defect_name,
+                                        defect_name2 = objModeldefect2.defect_name,
+                                        defect_name3 = objModeldefect3.defect_name,
+                                        defect_name4 = objModeldefect4.defect_name
+                                )
+    modelGlassWithDefect_add.save()
+    
+
+    # data_defect = Defect.objects.all()
+    # data_glass = modelGlass.objects.all()
+
+    # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
+    messages.success(request,'Add defect > ' + objModeldefect1.defect_name + ',' + objModeldefect2.defect_name + ',' + objModeldefect3.defect_name + ',' + objModeldefect4.defect_name + ' < in model > ' + inputModelCode + ' < successfully.')
+    return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+    'inputModelDesc':inputModelDesc,
+    'inputModelName':inputModelName,
+    'inputModelCode':inputModelCode,
+    'inputModelImage':inputModelImage,
+    'defects':data_defect,
+    'counter':counter})
+
+def add_defect20(request):
+    
+    point_defect = 4
+    data_defect = Defect.objects.all()
+    department = request.POST['department']
+
+    datepick = request.POST['datepick']
+    shift = request.POST['shift']
+    status_glass = request.POST['status_glass']
+    
+    
+
+    inputModelDesc = request.POST['inputModelDesc']
+    inputModelName = request.POST['inputModelName']
+    inputModelCode = request.POST['inputModelCode']
+    inputModelImage = request.POST['inputModelImage']
+    inputDefectP4_box5_defect1 = request.POST['inputDefectP4_box5_defect1']
+    inputDefectP4_box5_defect2 = request.POST['inputDefectP4_box5_defect2']
+    inputDefectP4_box5_defect3 = request.POST['inputDefectP4_box5_defect3']
+    inputDefectP4_box5_defect4 = request.POST['inputDefectP4_box5_defect4']
+    inputDefectP4_box5_defect5 = request.POST['inputDefectP4_box5_defect5']
+    
+    
+    objModeldefect1 = Defect.objects.get(id=inputDefectP4_box5_defect1)
+    objModeldefect2 = Defect.objects.get(id=inputDefectP4_box5_defect2)
+    objModeldefect3 = Defect.objects.get(id=inputDefectP4_box5_defect3)
+    objModeldefect4 = Defect.objects.get(id=inputDefectP4_box5_defect4)
+    objModeldefect5 = Defect.objects.get(id=inputDefectP4_box5_defect5)
+
+
+    modelGlassWithDefect_add = modelGlassWithDefect.objects.create(
+                                        date_select = datepick,
+                                        point_defect = point_defect,
+                                        shift = shift,
+                                        model_desc = inputModelDesc,
+                                        model_name = inputModelName,
+                                        model_code = inputModelCode,
+                                        department = department,
+                                        status_glass = status_glass,
+                                        number_glass = counter,
+                                        defect_name1 = objModeldefect1.defect_name,
+                                        defect_name2 = objModeldefect2.defect_name,
+                                        defect_name3 = objModeldefect3.defect_name,
+                                        defect_name4 = objModeldefect4.defect_name,
+                                        defect_name5 = objModeldefect5.defect_name
+                                )
+    modelGlassWithDefect_add.save()
+    
+
+    # data_defect = Defect.objects.all()
+    # data_glass = modelGlass.objects.all()
+
+    # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
+    messages.success(request,'Add defect > ' + objModeldefect1.defect_name + ',' + objModeldefect2.defect_name + ',' + objModeldefect3.defect_name + ',' + objModeldefect4.defect_name + ',' + objModeldefect5.defect_name + ' < in model > ' + inputModelCode + ' < successfully.')
+    return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+    'inputModelDesc':inputModelDesc,
+    'inputModelName':inputModelName,
+    'inputModelCode':inputModelCode,
+    'inputModelImage':inputModelImage,
+    'defects':data_defect,
+    'counter':counter})
+
+
+
+
+def add_defect21(request):
+    
+    point_defect = 5
+    data_defect = Defect.objects.all()
+    department = request.POST['department']
+
+    datepick = request.POST['datepick']
+    shift = request.POST['shift']
+    status_glass = request.POST['status_glass']
+    
+    
+
+    inputModelDesc = request.POST['inputModelDesc']
+    inputModelName = request.POST['inputModelName']
+    inputModelCode = request.POST['inputModelCode']
+    inputModelImage = request.POST['inputModelImage']
+    inputDefectP5_box1_defect1 = request.POST['inputDefectP5_box1_defect1']
+    
+    objModeldefect = Defect.objects.get(id=inputDefectP5_box1_defect1)
+
+
+    modelGlassWithDefect_add = modelGlassWithDefect.objects.create(
+                                        date_select = datepick,
+                                        point_defect = point_defect,
+                                        shift = shift,
+                                        model_desc = inputModelDesc,
+                                        model_name = inputModelName,
+                                        model_code = inputModelCode,
+                                        department = department,
+                                        status_glass = status_glass,
+                                        number_glass = counter,
+                                        defect_name1 = objModeldefect.defect_name
+                                )
+    modelGlassWithDefect_add.save()
+    
+
+    # data_defect = Defect.objects.all()
+    # data_glass = modelGlass.objects.all()
+
+    # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
+    messages.success(request,'Add defect > ' + objModeldefect.defect_name + ' < in model > ' + inputModelCode + ' < successfully.')
+    return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+    'inputModelDesc':inputModelDesc,
+    'inputModelName':inputModelName,
+    'inputModelCode':inputModelCode,
+    'inputModelImage':inputModelImage,
+    'defects':data_defect,
+    'counter':counter})
+
+def add_defect22(request):
+    
+    point_defect = 5
+    data_defect = Defect.objects.all()
+    department = request.POST['department']
+
+    datepick = request.POST['datepick']
+    shift = request.POST['shift']
+    status_glass = request.POST['status_glass']
+    
+    
+
+    inputModelDesc = request.POST['inputModelDesc']
+    inputModelName = request.POST['inputModelName']
+    inputModelCode = request.POST['inputModelCode']
+    inputModelImage = request.POST['inputModelImage']
+    inputDefectP5_box2_defect1 = request.POST['inputDefectP5_box2_defect1']
+    inputDefectP5_box2_defect2 = request.POST['inputDefectP5_box2_defect2']
+    
+    
+    objModeldefect1 = Defect.objects.get(id=inputDefectP5_box2_defect1)
+    objModeldefect2 = Defect.objects.get(id=inputDefectP5_box2_defect2)
+
+
+    modelGlassWithDefect_add = modelGlassWithDefect.objects.create(
+                                        date_select = datepick,
+                                        point_defect = point_defect,
+                                        shift = shift,
+                                        model_desc = inputModelDesc,
+                                        model_name = inputModelName,
+                                        model_code = inputModelCode,
+                                        department = department,
+                                        status_glass = status_glass,
+                                        number_glass = counter,
+                                        defect_name1 = objModeldefect1.defect_name,
+                                        defect_name2 = objModeldefect2.defect_name
+                                )
+    modelGlassWithDefect_add.save()
+    
+
+    # data_defect = Defect.objects.all()
+    # data_glass = modelGlass.objects.all()
+
+    # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
+    messages.success(request,'Add defect > ' + objModeldefect1.defect_name + ',' + objModeldefect2.defect_name + ' < in model > ' + inputModelCode + ' < successfully.')
+    return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+    'inputModelDesc':inputModelDesc,
+    'inputModelName':inputModelName,
+    'inputModelCode':inputModelCode,
+    'inputModelImage':inputModelImage,
+    'defects':data_defect,
+    'counter':counter})
+
+def add_defect23(request):
+    
+    point_defect = 5
+    data_defect = Defect.objects.all()
+    department = request.POST['department']
+
+    datepick = request.POST['datepick']
+    shift = request.POST['shift']
+    status_glass = request.POST['status_glass']
+    
+    
+
+    inputModelDesc = request.POST['inputModelDesc']
+    inputModelName = request.POST['inputModelName']
+    inputModelCode = request.POST['inputModelCode']
+    inputModelImage = request.POST['inputModelImage']
+    inputDefectP5_box3_defect1 = request.POST['inputDefectP5_box3_defect1']
+    inputDefectP5_box3_defect2 = request.POST['inputDefectP5_box3_defect2']
+    inputDefectP5_box3_defect3 = request.POST['inputDefectP5_box3_defect3']
+    
+    
+    objModeldefect1 = Defect.objects.get(id=inputDefectP5_box3_defect1)
+    objModeldefect2 = Defect.objects.get(id=inputDefectP5_box3_defect2)
+    objModeldefect3 = Defect.objects.get(id=inputDefectP5_box3_defect3)
+
+    modelGlassWithDefect_add = modelGlassWithDefect.objects.create(
+                                        date_select = datepick,
+                                        point_defect = point_defect,
+                                        shift = shift,
+                                        model_desc = inputModelDesc,
+                                        model_name = inputModelName,
+                                        model_code = inputModelCode,
+                                        department = department,
+                                        status_glass = status_glass,
+                                        number_glass = counter,
+                                        defect_name1 = objModeldefect1.defect_name,
+                                        defect_name2 = objModeldefect2.defect_name,
+                                        defect_name3 = objModeldefect3.defect_name
+                                )
+    modelGlassWithDefect_add.save()
+    
+
+    # data_defect = Defect.objects.all()
+    # data_glass = modelGlass.objects.all()
+
+    # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
+    messages.success(request,'Add defect > ' + objModeldefect1.defect_name + ',' + objModeldefect2.defect_name + ',' + objModeldefect3.defect_name + ' < in model > ' + inputModelCode + ' < successfully.')
+    return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+    'inputModelDesc':inputModelDesc,
+    'inputModelName':inputModelName,
+    'inputModelCode':inputModelCode,
+    'inputModelImage':inputModelImage,
+    'defects':data_defect,
+    'counter':counter})
+
+def add_defect24(request):
+    
+    point_defect = 5
+    data_defect = Defect.objects.all()
+    department = request.POST['department']
+
+    datepick = request.POST['datepick']
+    shift = request.POST['shift']
+    status_glass = request.POST['status_glass']
+    
+    
+
+    inputModelDesc = request.POST['inputModelDesc']
+    inputModelName = request.POST['inputModelName']
+    inputModelCode = request.POST['inputModelCode']
+    inputModelImage = request.POST['inputModelImage']
+    inputDefectP5_box4_defect1 = request.POST['inputDefectP5_box4_defect1']
+    inputDefectP5_box4_defect2 = request.POST['inputDefectP5_box4_defect2']
+    inputDefectP5_box4_defect3 = request.POST['inputDefectP5_box4_defect3']
+    inputDefectP5_box4_defect4 = request.POST['inputDefectP5_box4_defect4']
+    
+    
+    objModeldefect1 = Defect.objects.get(id=inputDefectP5_box4_defect1)
+    objModeldefect2 = Defect.objects.get(id=inputDefectP5_box4_defect2)
+    objModeldefect3 = Defect.objects.get(id=inputDefectP5_box4_defect3)
+    objModeldefect4 = Defect.objects.get(id=inputDefectP5_box4_defect4)
+
+
+    modelGlassWithDefect_add = modelGlassWithDefect.objects.create(
+                                        date_select = datepick,
+                                        point_defect = point_defect,
+                                        shift = shift,
+                                        model_desc = inputModelDesc,
+                                        model_name = inputModelName,
+                                        model_code = inputModelCode,
+                                        department = department,
+                                        status_glass = status_glass,
+                                        number_glass = counter,
+                                        defect_name1 = objModeldefect1.defect_name,
+                                        defect_name2 = objModeldefect2.defect_name,
+                                        defect_name3 = objModeldefect3.defect_name,
+                                        defect_name4 = objModeldefect4.defect_name
+                                )
+    modelGlassWithDefect_add.save()
+    
+
+    # data_defect = Defect.objects.all()
+    # data_glass = modelGlass.objects.all()
+
+    # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
+    messages.success(request,'Add defect > ' + objModeldefect1.defect_name + ',' + objModeldefect2.defect_name + ',' + objModeldefect3.defect_name + ',' + objModeldefect4.defect_name + ' < in model > ' + inputModelCode + ' < successfully.')
+    return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+    'inputModelDesc':inputModelDesc,
+    'inputModelName':inputModelName,
+    'inputModelCode':inputModelCode,
+    'inputModelImage':inputModelImage,
+    'defects':data_defect,
+    'counter':counter})
+
+def add_defect25(request):
+    
+    point_defect = 5
+    data_defect = Defect.objects.all()
+    department = request.POST['department']
+
+    datepick = request.POST['datepick']
+    shift = request.POST['shift']
+    status_glass = request.POST['status_glass']
+    
+    
+
+    inputModelDesc = request.POST['inputModelDesc']
+    inputModelName = request.POST['inputModelName']
+    inputModelCode = request.POST['inputModelCode']
+    inputModelImage = request.POST['inputModelImage']
+    inputDefectP5_box5_defect1 = request.POST['inputDefectP5_box5_defect1']
+    inputDefectP5_box5_defect2 = request.POST['inputDefectP5_box5_defect2']
+    inputDefectP5_box5_defect3 = request.POST['inputDefectP5_box5_defect3']
+    inputDefectP5_box5_defect4 = request.POST['inputDefectP5_box5_defect4']
+    inputDefectP5_box5_defect5 = request.POST['inputDefectP5_box5_defect5']
+    
+    
+    objModeldefect1 = Defect.objects.get(id=inputDefectP5_box5_defect1)
+    objModeldefect2 = Defect.objects.get(id=inputDefectP5_box5_defect2)
+    objModeldefect3 = Defect.objects.get(id=inputDefectP5_box5_defect3)
+    objModeldefect4 = Defect.objects.get(id=inputDefectP5_box5_defect4)
+    objModeldefect5 = Defect.objects.get(id=inputDefectP5_box5_defect5)
+
+
+    modelGlassWithDefect_add = modelGlassWithDefect.objects.create(
+                                        date_select = datepick,
+                                        point_defect = point_defect,
+                                        shift = shift,
+                                        model_desc = inputModelDesc,
+                                        model_name = inputModelName,
+                                        model_code = inputModelCode,
+                                        department = department,
+                                        status_glass = status_glass,
+                                        number_glass = counter,
+                                        defect_name1 = objModeldefect1.defect_name,
+                                        defect_name2 = objModeldefect2.defect_name,
+                                        defect_name3 = objModeldefect3.defect_name,
+                                        defect_name4 = objModeldefect4.defect_name,
+                                        defect_name5 = objModeldefect5.defect_name
+                                )
+    modelGlassWithDefect_add.save()
+    
+
+    # data_defect = Defect.objects.all()
+    # data_glass = modelGlass.objects.all()
+
+    # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
+    messages.success(request,'Add defect > ' + objModeldefect1.defect_name + ',' + objModeldefect2.defect_name + ',' + objModeldefect3.defect_name + ',' + objModeldefect4.defect_name + ',' + objModeldefect5.defect_name + ' < in model > ' + inputModelCode + ' < successfully.')
+    return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+    'inputModelDesc':inputModelDesc,
+    'inputModelName':inputModelName,
+    'inputModelCode':inputModelCode,
+    'inputModelImage':inputModelImage,
+    'defects':data_defect,
+    'counter':counter})
+
+
+
+
+
+def add_defect26(request):
+    
+   
+    point_defect = 6
+    data_defect = Defect.objects.all()
+    department = request.POST['department']
+
+    datepick = request.POST['datepick']
+    shift = request.POST['shift']
+    status_glass = request.POST['status_glass']
+    
+    
+
+    inputModelDesc = request.POST['inputModelDesc']
+    inputModelName = request.POST['inputModelName']
+    inputModelCode = request.POST['inputModelCode']
+    inputModelImage = request.POST['inputModelImage']
+    inputDefectP6_box1_defect1 = request.POST['inputDefectP6_box1_defect1']
+    
+    objModeldefect = Defect.objects.get(id=inputDefectP6_box1_defect1)
+
+
+    modelGlassWithDefect_add = modelGlassWithDefect.objects.create(
+                                        date_select = datepick,
+                                        point_defect = point_defect,
+                                        shift = shift,
+                                        model_desc = inputModelDesc,
+                                        model_name = inputModelName,
+                                        model_code = inputModelCode,
+                                        department = department,
+                                        status_glass = status_glass,
+                                        number_glass = counter,
+                                        defect_name1 = objModeldefect.defect_name
+                                )
+    modelGlassWithDefect_add.save()
+    
+
+    # data_defect = Defect.objects.all()
+    # data_glass = modelGlass.objects.all()
+
+    # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
+    messages.success(request,'Add defect > ' + objModeldefect.defect_name + ' < in model > ' + inputModelCode + ' < successfully.')
+    return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+    'inputModelDesc':inputModelDesc,
+    'inputModelName':inputModelName,
+    'inputModelCode':inputModelCode,
+    'inputModelImage':inputModelImage,
+    'defects':data_defect,
+    'counter':counter})
+
+def add_defect27(request):
+    
+    point_defect = 6
+    data_defect = Defect.objects.all()
+    department = request.POST['department']
+
+    datepick = request.POST['datepick']
+    shift = request.POST['shift']
+    status_glass = request.POST['status_glass']
+    
+    
+
+    inputModelDesc = request.POST['inputModelDesc']
+    inputModelName = request.POST['inputModelName']
+    inputModelCode = request.POST['inputModelCode']
+    inputModelImage = request.POST['inputModelImage']
+    inputDefectP6_box2_defect1 = request.POST['inputDefectP6_box2_defect1']
+    inputDefectP6_box2_defect2 = request.POST['inputDefectP6_box2_defect2']
+    
+    
+    objModeldefect1 = Defect.objects.get(id=inputDefectP6_box2_defect1)
+    objModeldefect2 = Defect.objects.get(id=inputDefectP6_box2_defect2)
+
+
+    modelGlassWithDefect_add = modelGlassWithDefect.objects.create(
+                                        date_select = datepick,
+                                        point_defect = point_defect,
+                                        shift = shift,
+                                        model_desc = inputModelDesc,
+                                        model_name = inputModelName,
+                                        model_code = inputModelCode,
+                                        department = department,
+                                        status_glass = status_glass,
+                                        number_glass = counter,
+                                        defect_name1 = objModeldefect1.defect_name,
+                                        defect_name2 = objModeldefect2.defect_name
+                                )
+    modelGlassWithDefect_add.save()
+    
+
+    # data_defect = Defect.objects.all()
+    # data_glass = modelGlass.objects.all()
+
+    # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
+    messages.success(request,'Add defect > ' + objModeldefect1.defect_name + ',' + objModeldefect2.defect_name + ' < in model > ' + inputModelCode + ' < successfully.')
+    return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+    'inputModelDesc':inputModelDesc,
+    'inputModelName':inputModelName,
+    'inputModelCode':inputModelCode,
+    'inputModelImage':inputModelImage,
+    'defects':data_defect,
+    'counter':counter})
+
+def add_defect28(request):
+    
+    point_defect = 6
+    data_defect = Defect.objects.all()
+    department = request.POST['department']
+
+    datepick = request.POST['datepick']
+    shift = request.POST['shift']
+    status_glass = request.POST['status_glass']
+    
+    
+
+    inputModelDesc = request.POST['inputModelDesc']
+    inputModelName = request.POST['inputModelName']
+    inputModelCode = request.POST['inputModelCode']
+    inputModelImage = request.POST['inputModelImage']
+    inputDefectP6_box3_defect1 = request.POST['inputDefectP6_box3_defect1']
+    inputDefectP6_box3_defect2 = request.POST['inputDefectP6_box3_defect2']
+    inputDefectP6_box3_defect3 = request.POST['inputDefectP6_box3_defect3']
+    
+    
+    objModeldefect1 = Defect.objects.get(id=inputDefectP6_box3_defect1)
+    objModeldefect2 = Defect.objects.get(id=inputDefectP6_box3_defect2)
+    objModeldefect3 = Defect.objects.get(id=inputDefectP6_box3_defect3)
+
+    modelGlassWithDefect_add = modelGlassWithDefect.objects.create(
+                                        date_select = datepick,
+                                        point_defect = point_defect,
+                                        shift = shift,
+                                        model_desc = inputModelDesc,
+                                        model_name = inputModelName,
+                                        model_code = inputModelCode,
+                                        department = department,
+                                        status_glass = status_glass,
+                                        number_glass = counter,
+                                        defect_name1 = objModeldefect1.defect_name,
+                                        defect_name2 = objModeldefect2.defect_name,
+                                        defect_name3 = objModeldefect3.defect_name
+                                )
+    modelGlassWithDefect_add.save()
+    
+
+    # data_defect = Defect.objects.all()
+    # data_glass = modelGlass.objects.all()
+
+    # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
+    messages.success(request,'Add defect > ' + objModeldefect1.defect_name + ',' + objModeldefect2.defect_name + ',' + objModeldefect3.defect_name + ' < in model > ' + inputModelCode + ' < successfully.')
+    return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+    'inputModelDesc':inputModelDesc,
+    'inputModelName':inputModelName,
+    'inputModelCode':inputModelCode,
+    'inputModelImage':inputModelImage,
+    'defects':data_defect,
+    'counter':counter})
+
+def add_defect29(request):
+    
+    point_defect = 6
+    data_defect = Defect.objects.all()
+    department = request.POST['department']
+
+    datepick = request.POST['datepick']
+    shift = request.POST['shift']
+    status_glass = request.POST['status_glass']
+    
+    
+
+    inputModelDesc = request.POST['inputModelDesc']
+    inputModelName = request.POST['inputModelName']
+    inputModelCode = request.POST['inputModelCode']
+    inputModelImage = request.POST['inputModelImage']
+    inputDefectP6_box4_defect1 = request.POST['inputDefectP6_box4_defect1']
+    inputDefectP6_box4_defect2 = request.POST['inputDefectP6_box4_defect2']
+    inputDefectP6_box4_defect3 = request.POST['inputDefectP6_box4_defect3']
+    inputDefectP6_box4_defect4 = request.POST['inputDefectP6_box4_defect4']
+    
+    
+    objModeldefect1 = Defect.objects.get(id=inputDefectP6_box4_defect1)
+    objModeldefect2 = Defect.objects.get(id=inputDefectP6_box4_defect2)
+    objModeldefect3 = Defect.objects.get(id=inputDefectP6_box4_defect3)
+    objModeldefect4 = Defect.objects.get(id=inputDefectP6_box4_defect4)
+
+
+    modelGlassWithDefect_add = modelGlassWithDefect.objects.create(
+                                        date_select = datepick,
+                                        point_defect = point_defect,
+                                        shift = shift,
+                                        model_desc = inputModelDesc,
+                                        model_name = inputModelName,
+                                        model_code = inputModelCode,
+                                        department = department,
+                                        status_glass = status_glass,
+                                        number_glass = counter,
+                                        defect_name1 = objModeldefect1.defect_name,
+                                        defect_name2 = objModeldefect2.defect_name,
+                                        defect_name3 = objModeldefect3.defect_name,
+                                        defect_name4 = objModeldefect4.defect_name
+                                )
+    modelGlassWithDefect_add.save()
+    
+
+    # data_defect = Defect.objects.all()
+    # data_glass = modelGlass.objects.all()
+
+    # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
+    messages.success(request,'Add defect > ' + objModeldefect1.defect_name + ',' + objModeldefect2.defect_name + ',' + objModeldefect3.defect_name + ',' + objModeldefect4.defect_name + ' < in model > ' + inputModelCode + ' < successfully.')
+    return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+    'inputModelDesc':inputModelDesc,
+    'inputModelName':inputModelName,
+    'inputModelCode':inputModelCode,
+    'inputModelImage':inputModelImage,
+    'defects':data_defect,
+    'counter':counter})
+
+def add_defect30(request):
+    
+ 
+    point_defect = 6
+    data_defect = Defect.objects.all()
+    department = request.POST['department']
+
+    datepick = request.POST['datepick']
+    shift = request.POST['shift']
+    status_glass = request.POST['status_glass']
+    
+    
+
+    inputModelDesc = request.POST['inputModelDesc']
+    inputModelName = request.POST['inputModelName']
+    inputModelCode = request.POST['inputModelCode']
+    inputModelImage = request.POST['inputModelImage']
+    inputDefectP6_box5_defect1 = request.POST['inputDefectP6_box5_defect1']
+    inputDefectP6_box5_defect2 = request.POST['inputDefectP6_box5_defect2']
+    inputDefectP6_box5_defect3 = request.POST['inputDefectP6_box5_defect3']
+    inputDefectP6_box5_defect4 = request.POST['inputDefectP6_box5_defect4']
+    inputDefectP6_box5_defect5 = request.POST['inputDefectP6_box5_defect5']
+    
+    
+    objModeldefect1 = Defect.objects.get(id=inputDefectP6_box5_defect1)
+    objModeldefect2 = Defect.objects.get(id=inputDefectP6_box5_defect2)
+    objModeldefect3 = Defect.objects.get(id=inputDefectP6_box5_defect3)
+    objModeldefect4 = Defect.objects.get(id=inputDefectP6_box5_defect4)
+    objModeldefect5 = Defect.objects.get(id=inputDefectP6_box5_defect5)
+
+
+    modelGlassWithDefect_add = modelGlassWithDefect.objects.create(
+                                        date_select = datepick,
+                                        point_defect = point_defect,
+                                        shift = shift,
+                                        model_desc = inputModelDesc,
+                                        model_name = inputModelName,
+                                        model_code = inputModelCode,
+                                        department = department,
+                                        status_glass = status_glass,
+                                        number_glass = counter,
+                                        defect_name1 = objModeldefect1.defect_name,
+                                        defect_name2 = objModeldefect2.defect_name,
+                                        defect_name3 = objModeldefect3.defect_name,
+                                        defect_name4 = objModeldefect4.defect_name,
+                                        defect_name5 = objModeldefect5.defect_name
+                                )
+    modelGlassWithDefect_add.save()
+    
+
+    # data_defect = Defect.objects.all()
+    # data_glass = modelGlass.objects.all()
+
+    # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
+    messages.success(request,'Add defect > ' + objModeldefect1.defect_name + ',' + objModeldefect2.defect_name + ',' + objModeldefect3.defect_name + ',' + objModeldefect4.defect_name + ',' + objModeldefect5.defect_name + ' < in model > ' + inputModelCode + ' < successfully.')
+    return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+    'inputModelDesc':inputModelDesc,
+    'inputModelName':inputModelName,
+    'inputModelCode':inputModelCode,
+    'inputModelImage':inputModelImage,
+    'defects':data_defect,
+    'counter':counter})
+
+
+
+
+
+def add_defect31(request):
+    
+    point_defect = 7
+    data_defect = Defect.objects.all()
+    department = request.POST['department']
+
+    datepick = request.POST['datepick']
+    shift = request.POST['shift']
+    status_glass = request.POST['status_glass']
+    
+    
+
+    inputModelDesc = request.POST['inputModelDesc']
+    inputModelName = request.POST['inputModelName']
+    inputModelCode = request.POST['inputModelCode']
+    inputModelImage = request.POST['inputModelImage']
+    inputDefectP7_box1_defect1 = request.POST['inputDefectP7_box1_defect1']
+    
+    objModeldefect = Defect.objects.get(id=inputDefectP7_box1_defect1)
+
+
+    modelGlassWithDefect_add = modelGlassWithDefect.objects.create(
+                                        date_select = datepick,
+                                        point_defect = point_defect,
+                                        shift = shift,
+                                        model_desc = inputModelDesc,
+                                        model_name = inputModelName,
+                                        model_code = inputModelCode,
+                                        department = department,
+                                        status_glass = status_glass,
+                                        number_glass = counter,
+                                        defect_name1 = objModeldefect.defect_name
+                                )
+    modelGlassWithDefect_add.save()
+    
+
+    # data_defect = Defect.objects.all()
+    # data_glass = modelGlass.objects.all()
+
+    # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
+    messages.success(request,'Add defect > ' + objModeldefect.defect_name + ' < in model > ' + inputModelCode + ' < successfully.')
+    return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+    'inputModelDesc':inputModelDesc,
+    'inputModelName':inputModelName,
+    'inputModelCode':inputModelCode,
+    'inputModelImage':inputModelImage,
+    'defects':data_defect,
+    'counter':counter})
+
+def add_defect32(request):
+    
+    point_defect = 7
+    data_defect = Defect.objects.all()
+    department = request.POST['department']
+
+    datepick = request.POST['datepick']
+    shift = request.POST['shift']
+    status_glass = request.POST['status_glass']
+    
+    
+
+    inputModelDesc = request.POST['inputModelDesc']
+    inputModelName = request.POST['inputModelName']
+    inputModelCode = request.POST['inputModelCode']
+    inputModelImage = request.POST['inputModelImage']
+    inputDefectP7_box2_defect1 = request.POST['inputDefectP7_box2_defect1']
+    inputDefectP7_box2_defect2 = request.POST['inputDefectP7_box2_defect2']
+    
+    
+    objModeldefect1 = Defect.objects.get(id=inputDefectP7_box2_defect1)
+    objModeldefect2 = Defect.objects.get(id=inputDefectP7_box2_defect2)
+
+
+    modelGlassWithDefect_add = modelGlassWithDefect.objects.create(
+                                        date_select = datepick,
+                                        point_defect = point_defect,
+                                        shift = shift,
+                                        model_desc = inputModelDesc,
+                                        model_name = inputModelName,
+                                        model_code = inputModelCode,
+                                        department = department,
+                                        status_glass = status_glass,
+                                        number_glass = counter,
+                                        defect_name1 = objModeldefect1.defect_name,
+                                        defect_name2 = objModeldefect2.defect_name
+                                )
+    modelGlassWithDefect_add.save()
+    
+
+    # data_defect = Defect.objects.all()
+    # data_glass = modelGlass.objects.all()
+
+    # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
+    messages.success(request,'Add defect > ' + objModeldefect1.defect_name + ',' + objModeldefect2.defect_name + ' < in model > ' + inputModelCode + ' < successfully.')
+    return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+    'inputModelDesc':inputModelDesc,
+    'inputModelName':inputModelName,
+    'inputModelCode':inputModelCode,
+    'inputModelImage':inputModelImage,
+    'defects':data_defect,
+    'counter':counter})
+
+def add_defect33(request):
+    
+    point_defect = 7
+    data_defect = Defect.objects.all()
+    department = request.POST['department']
+
+    datepick = request.POST['datepick']
+    shift = request.POST['shift']
+    status_glass = request.POST['status_glass']
+    
+    
+
+    inputModelDesc = request.POST['inputModelDesc']
+    inputModelName = request.POST['inputModelName']
+    inputModelCode = request.POST['inputModelCode']
+    inputModelImage = request.POST['inputModelImage']
+    inputDefectP7_box3_defect1 = request.POST['inputDefectP7_box3_defect1']
+    inputDefectP7_box3_defect2 = request.POST['inputDefectP7_box3_defect2']
+    inputDefectP7_box3_defect3 = request.POST['inputDefectP7_box3_defect3']
+    
+    
+    objModeldefect1 = Defect.objects.get(id=inputDefectP7_box3_defect1)
+    objModeldefect2 = Defect.objects.get(id=inputDefectP7_box3_defect2)
+    objModeldefect3 = Defect.objects.get(id=inputDefectP7_box3_defect3)
+
+    modelGlassWithDefect_add = modelGlassWithDefect.objects.create(
+                                        date_select = datepick,
+                                        point_defect = point_defect,
+                                        shift = shift,
+                                        model_desc = inputModelDesc,
+                                        model_name = inputModelName,
+                                        model_code = inputModelCode,
+                                        department = department,
+                                        status_glass = status_glass,
+                                        number_glass = counter,
+                                        defect_name1 = objModeldefect1.defect_name,
+                                        defect_name2 = objModeldefect2.defect_name,
+                                        defect_name3 = objModeldefect3.defect_name
+                                )
+    modelGlassWithDefect_add.save()
+    
+
+    # data_defect = Defect.objects.all()
+    # data_glass = modelGlass.objects.all()
+
+    # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
+    messages.success(request,'Add defect > ' + objModeldefect1.defect_name + ',' + objModeldefect2.defect_name + ',' + objModeldefect3.defect_name + ' < in model > ' + inputModelCode + ' < successfully.')
+    return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+    'inputModelDesc':inputModelDesc,
+    'inputModelName':inputModelName,
+    'inputModelCode':inputModelCode,
+    'inputModelImage':inputModelImage,
+    'defects':data_defect,
+    'counter':counter})
+
+def add_defect34(request):
+    
+    point_defect = 7
+    data_defect = Defect.objects.all()
+    department = request.POST['department']
+
+    datepick = request.POST['datepick']
+    shift = request.POST['shift']
+    status_glass = request.POST['status_glass']
+    
+    
+
+    inputModelDesc = request.POST['inputModelDesc']
+    inputModelName = request.POST['inputModelName']
+    inputModelCode = request.POST['inputModelCode']
+    inputModelImage = request.POST['inputModelImage']
+    inputDefectP7_box4_defect1 = request.POST['inputDefectP7_box4_defect1']
+    inputDefectP7_box4_defect2 = request.POST['inputDefectP7_box4_defect2']
+    inputDefectP7_box4_defect3 = request.POST['inputDefectP7_box4_defect3']
+    inputDefectP7_box4_defect4 = request.POST['inputDefectP7_box4_defect4']
+    
+    
+    objModeldefect1 = Defect.objects.get(id=inputDefectP7_box4_defect1)
+    objModeldefect2 = Defect.objects.get(id=inputDefectP7_box4_defect2)
+    objModeldefect3 = Defect.objects.get(id=inputDefectP7_box4_defect3)
+    objModeldefect4 = Defect.objects.get(id=inputDefectP7_box4_defect4)
+
+
+    modelGlassWithDefect_add = modelGlassWithDefect.objects.create(
+                                        date_select = datepick,
+                                        point_defect = point_defect,
+                                        shift = shift,
+                                        model_desc = inputModelDesc,
+                                        model_name = inputModelName,
+                                        model_code = inputModelCode,
+                                        department = department,
+                                        status_glass = status_glass,
+                                        number_glass = counter,
+                                        defect_name1 = objModeldefect1.defect_name,
+                                        defect_name2 = objModeldefect2.defect_name,
+                                        defect_name3 = objModeldefect3.defect_name,
+                                        defect_name4 = objModeldefect4.defect_name
+                                )
+    modelGlassWithDefect_add.save()
+    
+
+    # data_defect = Defect.objects.all()
+    # data_glass = modelGlass.objects.all()
+
+    # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
+    messages.success(request,'Add defect > ' + objModeldefect1.defect_name + ',' + objModeldefect2.defect_name + ',' + objModeldefect3.defect_name + ',' + objModeldefect4.defect_name + ' < in model > ' + inputModelCode + ' < successfully.')
+    return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+    'inputModelDesc':inputModelDesc,
+    'inputModelName':inputModelName,
+    'inputModelCode':inputModelCode,
+    'inputModelImage':inputModelImage,
+    'defects':data_defect,
+    'counter':counter})
+
+def add_defect35(request):
+    
+    point_defect = 7
+    data_defect = Defect.objects.all()
+    department = request.POST['department']
+
+    datepick = request.POST['datepick']
+    shift = request.POST['shift']
+    status_glass = request.POST['status_glass']
+    
+    
+
+    inputModelDesc = request.POST['inputModelDesc']
+    inputModelName = request.POST['inputModelName']
+    inputModelCode = request.POST['inputModelCode']
+    inputModelImage = request.POST['inputModelImage']
+    inputDefectP7_box5_defect1 = request.POST['inputDefectP7_box5_defect1']
+    inputDefectP7_box5_defect2 = request.POST['inputDefectP7_box5_defect2']
+    inputDefectP7_box5_defect3 = request.POST['inputDefectP7_box5_defect3']
+    inputDefectP7_box5_defect4 = request.POST['inputDefectP7_box5_defect4']
+    inputDefectP7_box5_defect5 = request.POST['inputDefectP7_box5_defect5']
+    
+    
+    objModeldefect1 = Defect.objects.get(id=inputDefectP7_box5_defect1)
+    objModeldefect2 = Defect.objects.get(id=inputDefectP7_box5_defect2)
+    objModeldefect3 = Defect.objects.get(id=inputDefectP7_box5_defect3)
+    objModeldefect4 = Defect.objects.get(id=inputDefectP7_box5_defect4)
+    objModeldefect5 = Defect.objects.get(id=inputDefectP7_box5_defect5)
+
+
+    modelGlassWithDefect_add = modelGlassWithDefect.objects.create(
+                                        date_select = datepick,
+                                        point_defect = point_defect,
+                                        shift = shift,
+                                        model_desc = inputModelDesc,
+                                        model_name = inputModelName,
+                                        model_code = inputModelCode,
+                                        department = department,
+                                        status_glass = status_glass,
+                                        number_glass = counter,
+                                        defect_name1 = objModeldefect1.defect_name,
+                                        defect_name2 = objModeldefect2.defect_name,
+                                        defect_name3 = objModeldefect3.defect_name,
+                                        defect_name4 = objModeldefect4.defect_name,
+                                        defect_name5 = objModeldefect5.defect_name
+                                )
+    modelGlassWithDefect_add.save()
+    
+
+    # data_defect = Defect.objects.all()
+    # data_glass = modelGlass.objects.all()
+
+    # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
+    messages.success(request,'Add defect > ' + objModeldefect1.defect_name + ',' + objModeldefect2.defect_name + ',' + objModeldefect3.defect_name + ',' + objModeldefect4.defect_name + ',' + objModeldefect5.defect_name + ' < in model > ' + inputModelCode + ' < successfully.')
+    return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+    'inputModelDesc':inputModelDesc,
+    'inputModelName':inputModelName,
+    'inputModelCode':inputModelCode,
+    'inputModelImage':inputModelImage,
+    'defects':data_defect,
+    'counter':counter})
+
+
+
+
+def add_defect36(request):
+    
+    point_defect = 8
+    data_defect = Defect.objects.all()
+    department = request.POST['department']
+
+    datepick = request.POST['datepick']
+    shift = request.POST['shift']
+    status_glass = request.POST['status_glass']
+    
+    
+
+    inputModelDesc = request.POST['inputModelDesc']
+    inputModelName = request.POST['inputModelName']
+    inputModelCode = request.POST['inputModelCode']
+    inputModelImage = request.POST['inputModelImage']
+    inputDefectP8_box1_defect1 = request.POST['inputDefectP8_box1_defect1']
+    
+    objModeldefect = Defect.objects.get(id=inputDefectP8_box1_defect1)
+
+
+    modelGlassWithDefect_add = modelGlassWithDefect.objects.create(
+                                        date_select = datepick,
+                                        point_defect = point_defect,
+                                        shift = shift,
+                                        model_desc = inputModelDesc,
+                                        model_name = inputModelName,
+                                        model_code = inputModelCode,
+                                        department = department,
+                                        status_glass = status_glass,
+                                        number_glass = counter,
+                                        defect_name1 = objModeldefect.defect_name
+                                )
+    modelGlassWithDefect_add.save()
+    
+
+    # data_defect = Defect.objects.all()
+    # data_glass = modelGlass.objects.all()
+
+    # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
+    messages.success(request,'Add defect > ' + objModeldefect.defect_name + ' < in model > ' + inputModelCode + ' < successfully.')
+    return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+    'inputModelDesc':inputModelDesc,
+    'inputModelName':inputModelName,
+    'inputModelCode':inputModelCode,
+    'inputModelImage':inputModelImage,
+    'defects':data_defect,
+    'counter':counter})
+
+def add_defect37(request):
+    
+    point_defect = 8
+    data_defect = Defect.objects.all()
+    department = request.POST['department']
+
+    datepick = request.POST['datepick']
+    shift = request.POST['shift']
+    status_glass = request.POST['status_glass']
+    
+    
+
+    inputModelDesc = request.POST['inputModelDesc']
+    inputModelName = request.POST['inputModelName']
+    inputModelCode = request.POST['inputModelCode']
+    inputModelImage = request.POST['inputModelImage']
+    inputDefectP8_box2_defect1 = request.POST['inputDefectP8_box2_defect1']
+    inputDefectP8_box2_defect2 = request.POST['inputDefectP8_box2_defect2']
+    
+    
+    objModeldefect1 = Defect.objects.get(id=inputDefectP8_box2_defect1)
+    objModeldefect2 = Defect.objects.get(id=inputDefectP8_box2_defect2)
+
+
+    modelGlassWithDefect_add = modelGlassWithDefect.objects.create(
+                                        date_select = datepick,
+                                        point_defect = point_defect,
+                                        shift = shift,
+                                        model_desc = inputModelDesc,
+                                        model_name = inputModelName,
+                                        model_code = inputModelCode,
+                                        department = department,
+                                        status_glass = status_glass,
+                                        number_glass = counter,
+                                        defect_name1 = objModeldefect1.defect_name,
+                                        defect_name2 = objModeldefect2.defect_name
+                                )
+    modelGlassWithDefect_add.save()
+    
+
+    # data_defect = Defect.objects.all()
+    # data_glass = modelGlass.objects.all()
+
+    # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
+    messages.success(request,'Add defect > ' + objModeldefect1.defect_name + ',' + objModeldefect2.defect_name + ' < in model > ' + inputModelCode + ' < successfully.')
+    return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+    'inputModelDesc':inputModelDesc,
+    'inputModelName':inputModelName,
+    'inputModelCode':inputModelCode,
+    'inputModelImage':inputModelImage,
+    'defects':data_defect,
+    'counter':counter})
+
+def add_defect38(request):
+    
+    point_defect = 8
+    data_defect = Defect.objects.all()
+    department = request.POST['department']
+
+    datepick = request.POST['datepick']
+    shift = request.POST['shift']
+    status_glass = request.POST['status_glass']
+    
+    
+
+    inputModelDesc = request.POST['inputModelDesc']
+    inputModelName = request.POST['inputModelName']
+    inputModelCode = request.POST['inputModelCode']
+    inputModelImage = request.POST['inputModelImage']
+    inputDefectP8_box3_defect1 = request.POST['inputDefectP8_box3_defect1']
+    inputDefectP8_box3_defect2 = request.POST['inputDefectP8_box3_defect2']
+    inputDefectP8_box3_defect3 = request.POST['inputDefectP8_box3_defect3']
+    
+    
+    objModeldefect1 = Defect.objects.get(id=inputDefectP8_box3_defect1)
+    objModeldefect2 = Defect.objects.get(id=inputDefectP8_box3_defect2)
+    objModeldefect3 = Defect.objects.get(id=inputDefectP8_box3_defect3)
+
+    modelGlassWithDefect_add = modelGlassWithDefect.objects.create(
+                                        date_select = datepick,
+                                        point_defect = point_defect,
+                                        shift = shift,
+                                        model_desc = inputModelDesc,
+                                        model_name = inputModelName,
+                                        model_code = inputModelCode,
+                                        department = department,
+                                        status_glass = status_glass,
+                                        number_glass = counter,
+                                        defect_name1 = objModeldefect1.defect_name,
+                                        defect_name2 = objModeldefect2.defect_name,
+                                        defect_name3 = objModeldefect3.defect_name
+                                )
+    modelGlassWithDefect_add.save()
+    
+
+    # data_defect = Defect.objects.all()
+    # data_glass = modelGlass.objects.all()
+
+    # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
+    messages.success(request,'Add defect > ' + objModeldefect1.defect_name + ',' + objModeldefect2.defect_name + ',' + objModeldefect3.defect_name + ' < in model > ' + inputModelCode + ' < successfully.')
+    return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+    'inputModelDesc':inputModelDesc,
+    'inputModelName':inputModelName,
+    'inputModelCode':inputModelCode,
+    'inputModelImage':inputModelImage,
+    'defects':data_defect,
+    'counter':counter})
+
+def add_defect39(request):
+    
+    point_defect = 8
+    data_defect = Defect.objects.all()
+    department = request.POST['department']
+
+    datepick = request.POST['datepick']
+    shift = request.POST['shift']
+    status_glass = request.POST['status_glass']
+    
+    
+
+    inputModelDesc = request.POST['inputModelDesc']
+    inputModelName = request.POST['inputModelName']
+    inputModelCode = request.POST['inputModelCode']
+    inputModelImage = request.POST['inputModelImage']
+    inputDefectP8_box4_defect1 = request.POST['inputDefectP8_box4_defect1']
+    inputDefectP8_box4_defect2 = request.POST['inputDefectP8_box4_defect2']
+    inputDefectP8_box4_defect3 = request.POST['inputDefectP8_box4_defect3']
+    inputDefectP8_box4_defect4 = request.POST['inputDefectP8_box4_defect4']
+    
+    
+    objModeldefect1 = Defect.objects.get(id=inputDefectP8_box4_defect1)
+    objModeldefect2 = Defect.objects.get(id=inputDefectP8_box4_defect2)
+    objModeldefect3 = Defect.objects.get(id=inputDefectP8_box4_defect3)
+    objModeldefect4 = Defect.objects.get(id=inputDefectP8_box4_defect4)
+
+
+    modelGlassWithDefect_add = modelGlassWithDefect.objects.create(
+                                        date_select = datepick,
+                                        point_defect = point_defect,
+                                        shift = shift,
+                                        model_desc = inputModelDesc,
+                                        model_name = inputModelName,
+                                        model_code = inputModelCode,
+                                        department = department,
+                                        status_glass = status_glass,
+                                        number_glass = counter,
+                                        defect_name1 = objModeldefect1.defect_name,
+                                        defect_name2 = objModeldefect2.defect_name,
+                                        defect_name3 = objModeldefect3.defect_name,
+                                        defect_name4 = objModeldefect4.defect_name
+                                )
+    modelGlassWithDefect_add.save()
+    
+
+    # data_defect = Defect.objects.all()
+    # data_glass = modelGlass.objects.all()
+
+    # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
+    messages.success(request,'Add defect > ' + objModeldefect1.defect_name + ',' + objModeldefect2.defect_name + ',' + objModeldefect3.defect_name + ',' + objModeldefect4.defect_name + ' < in model > ' + inputModelCode + ' < successfully.')
+    return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+    'inputModelDesc':inputModelDesc,
+    'inputModelName':inputModelName,
+    'inputModelCode':inputModelCode,
+    'inputModelImage':inputModelImage,
+    'defects':data_defect,
+    'counter':counter})
+
+def add_defect40(request):
+    
+    point_defect = 8
+    data_defect = Defect.objects.all()
+    department = request.POST['department']
+
+    datepick = request.POST['datepick']
+    shift = request.POST['shift']
+    status_glass = request.POST['status_glass']
+    
+    
+
+    inputModelDesc = request.POST['inputModelDesc']
+    inputModelName = request.POST['inputModelName']
+    inputModelCode = request.POST['inputModelCode']
+    inputModelImage = request.POST['inputModelImage']
+    inputDefectP8_box5_defect1 = request.POST['inputDefectP8_box5_defect1']
+    inputDefectP8_box5_defect2 = request.POST['inputDefectP8_box5_defect2']
+    inputDefectP8_box5_defect3 = request.POST['inputDefectP8_box5_defect3']
+    inputDefectP8_box5_defect4 = request.POST['inputDefectP8_box5_defect4']
+    inputDefectP8_box5_defect5 = request.POST['inputDefectP8_box5_defect5']
+    
+    
+    objModeldefect1 = Defect.objects.get(id=inputDefectP8_box5_defect1)
+    objModeldefect2 = Defect.objects.get(id=inputDefectP8_box5_defect2)
+    objModeldefect3 = Defect.objects.get(id=inputDefectP8_box5_defect3)
+    objModeldefect4 = Defect.objects.get(id=inputDefectP8_box5_defect4)
+    objModeldefect5 = Defect.objects.get(id=inputDefectP8_box5_defect5)
+
+
+    modelGlassWithDefect_add = modelGlassWithDefect.objects.create(
+                                        date_select = datepick,
+                                        point_defect = point_defect,
+                                        shift = shift,
+                                        model_desc = inputModelDesc,
+                                        model_name = inputModelName,
+                                        model_code = inputModelCode,
+                                        department = department,
+                                        status_glass = status_glass,
+                                        number_glass = counter,
+                                        defect_name1 = objModeldefect1.defect_name,
+                                        defect_name2 = objModeldefect2.defect_name,
+                                        defect_name3 = objModeldefect3.defect_name,
+                                        defect_name4 = objModeldefect4.defect_name,
+                                        defect_name5 = objModeldefect5.defect_name
+                                )
+    modelGlassWithDefect_add.save()
+    
+
+    # data_defect = Defect.objects.all()
+    # data_glass = modelGlass.objects.all()
+
+    # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
+    messages.success(request,'Add defect > ' + objModeldefect1.defect_name + ',' + objModeldefect2.defect_name + ',' + objModeldefect3.defect_name + ',' + objModeldefect4.defect_name + ',' + objModeldefect5.defect_name + ' < in model > ' + inputModelCode + ' < successfully.')
+    return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+    'inputModelDesc':inputModelDesc,
+    'inputModelName':inputModelName,
+    'inputModelCode':inputModelCode,
+    'inputModelImage':inputModelImage,
+    'defects':data_defect,
+    'counter':counter})
+
+
+
+
+def add_defect41(request):
+    
+    point_defect = 9
+    data_defect = Defect.objects.all()
+    department = request.POST['department']
+
+    datepick = request.POST['datepick']
+    shift = request.POST['shift']
+    status_glass = request.POST['status_glass']
+    
+    
+
+    inputModelDesc = request.POST['inputModelDesc']
+    inputModelName = request.POST['inputModelName']
+    inputModelCode = request.POST['inputModelCode']
+    inputModelImage = request.POST['inputModelImage']
+    inputDefectP9_box1_defect1 = request.POST['inputDefectP9_box1_defect1']
+    
+    objModeldefect = Defect.objects.get(id=inputDefectP9_box1_defect1)
+
+
+    modelGlassWithDefect_add = modelGlassWithDefect.objects.create(
+                                        date_select = datepick,
+                                        point_defect = point_defect,
+                                        shift = shift,
+                                        model_desc = inputModelDesc,
+                                        model_name = inputModelName,
+                                        model_code = inputModelCode,
+                                        department = department,
+                                        status_glass = status_glass,
+                                        number_glass = counter,
+                                        defect_name1 = objModeldefect.defect_name
+                                )
+    modelGlassWithDefect_add.save()
+    
+
+    # data_defect = Defect.objects.all()
+    # data_glass = modelGlass.objects.all()
+
+    # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
+    messages.success(request,'Add defect > ' + objModeldefect.defect_name + ' < in model > ' + inputModelCode + ' < successfully.')
+    return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+    'inputModelDesc':inputModelDesc,
+    'inputModelName':inputModelName,
+    'inputModelCode':inputModelCode,
+    'inputModelImage':inputModelImage,
+    'defects':data_defect,
+    'counter':counter})
+
+def add_defect42(request):
+    
+    point_defect = 9
+    data_defect = Defect.objects.all()
+    department = request.POST['department']
+
+    datepick = request.POST['datepick']
+    shift = request.POST['shift']
+    status_glass = request.POST['status_glass']
+    
+    
+
+    inputModelDesc = request.POST['inputModelDesc']
+    inputModelName = request.POST['inputModelName']
+    inputModelCode = request.POST['inputModelCode']
+    inputModelImage = request.POST['inputModelImage']
+    inputDefectP9_box2_defect1 = request.POST['inputDefectP9_box2_defect1']
+    inputDefectP9_box2_defect2 = request.POST['inputDefectP9_box2_defect2']
+    
+    
+    objModeldefect1 = Defect.objects.get(id=inputDefectP9_box2_defect1)
+    objModeldefect2 = Defect.objects.get(id=inputDefectP9_box2_defect2)
+
+
+    modelGlassWithDefect_add = modelGlassWithDefect.objects.create(
+                                        date_select = datepick,
+                                        point_defect = point_defect,
+                                        shift = shift,
+                                        model_desc = inputModelDesc,
+                                        model_name = inputModelName,
+                                        model_code = inputModelCode,
+                                        department = department,
+                                        status_glass = status_glass,
+                                        number_glass = counter,
+                                        defect_name1 = objModeldefect1.defect_name,
+                                        defect_name2 = objModeldefect2.defect_name
+                                )
+    modelGlassWithDefect_add.save()
+    
+
+    # data_defect = Defect.objects.all()
+    # data_glass = modelGlass.objects.all()
+
+    # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
+    messages.success(request,'Add defect > ' + objModeldefect1.defect_name + ',' + objModeldefect2.defect_name + ' < in model > ' + inputModelCode + ' < successfully.')
+    return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+    'inputModelDesc':inputModelDesc,
+    'inputModelName':inputModelName,
+    'inputModelCode':inputModelCode,
+    'inputModelImage':inputModelImage,
+    'defects':data_defect,
+    'counter':counter})
+
+def add_defect43(request):
+    
+    point_defect = 9
+    data_defect = Defect.objects.all()
+    department = request.POST['department']
+
+    datepick = request.POST['datepick']
+    shift = request.POST['shift']
+    status_glass = request.POST['status_glass']
+    
+    
+
+    inputModelDesc = request.POST['inputModelDesc']
+    inputModelName = request.POST['inputModelName']
+    inputModelCode = request.POST['inputModelCode']
+    inputModelImage = request.POST['inputModelImage']
+    inputDefectP9_box3_defect1 = request.POST['inputDefectP9_box3_defect1']
+    inputDefectP9_box3_defect2 = request.POST['inputDefectP9_box3_defect2']
+    inputDefectP9_box3_defect3 = request.POST['inputDefectP9_box3_defect3']
+    
+    
+    objModeldefect1 = Defect.objects.get(id=inputDefectP9_box3_defect1)
+    objModeldefect2 = Defect.objects.get(id=inputDefectP9_box3_defect2)
+    objModeldefect3 = Defect.objects.get(id=inputDefectP9_box3_defect3)
+
+    modelGlassWithDefect_add = modelGlassWithDefect.objects.create(
+                                        date_select = datepick,
+                                        point_defect = point_defect,
+                                        shift = shift,
+                                        model_desc = inputModelDesc,
+                                        model_name = inputModelName,
+                                        model_code = inputModelCode,
+                                        department = department,
+                                        status_glass = status_glass,
+                                        number_glass = counter,
+                                        defect_name1 = objModeldefect1.defect_name,
+                                        defect_name2 = objModeldefect2.defect_name,
+                                        defect_name3 = objModeldefect3.defect_name
+                                )
+    modelGlassWithDefect_add.save()
+    
+
+    # data_defect = Defect.objects.all()
+    # data_glass = modelGlass.objects.all()
+
+    # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
+    messages.success(request,'Add defect > ' + objModeldefect1.defect_name + ',' + objModeldefect2.defect_name + ',' + objModeldefect3.defect_name + ' < in model > ' + inputModelCode + ' < successfully.')
+    return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+    'inputModelDesc':inputModelDesc,
+    'inputModelName':inputModelName,
+    'inputModelCode':inputModelCode,
+    'inputModelImage':inputModelImage,
+    'defects':data_defect,
+    'counter':counter})
+
+def add_defect44(request):
+    
+    point_defect = 9
+    data_defect = Defect.objects.all()
+    department = request.POST['department']
+
+    datepick = request.POST['datepick']
+    shift = request.POST['shift']
+    status_glass = request.POST['status_glass']
+    
+    
+
+    inputModelDesc = request.POST['inputModelDesc']
+    inputModelName = request.POST['inputModelName']
+    inputModelCode = request.POST['inputModelCode']
+    inputModelImage = request.POST['inputModelImage']
+    inputDefectP9_box4_defect1 = request.POST['inputDefectP9_box4_defect1']
+    inputDefectP9_box4_defect2 = request.POST['inputDefectP9_box4_defect2']
+    inputDefectP9_box4_defect3 = request.POST['inputDefectP9_box4_defect3']
+    inputDefectP9_box4_defect4 = request.POST['inputDefectP9_box4_defect4']
+    
+    
+    objModeldefect1 = Defect.objects.get(id=inputDefectP9_box4_defect1)
+    objModeldefect2 = Defect.objects.get(id=inputDefectP9_box4_defect2)
+    objModeldefect3 = Defect.objects.get(id=inputDefectP9_box4_defect3)
+    objModeldefect4 = Defect.objects.get(id=inputDefectP9_box4_defect4)
+
+
+    modelGlassWithDefect_add = modelGlassWithDefect.objects.create(
+                                        date_select = datepick,
+                                        point_defect = point_defect,
+                                        shift = shift,
+                                        model_desc = inputModelDesc,
+                                        model_name = inputModelName,
+                                        model_code = inputModelCode,
+                                        department = department,
+                                        status_glass = status_glass,
+                                        number_glass = counter,
+                                        defect_name1 = objModeldefect1.defect_name,
+                                        defect_name2 = objModeldefect2.defect_name,
+                                        defect_name3 = objModeldefect3.defect_name,
+                                        defect_name4 = objModeldefect4.defect_name
+                                )
+    modelGlassWithDefect_add.save()
+    
+
+    # data_defect = Defect.objects.all()
+    # data_glass = modelGlass.objects.all()
+
+    # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
+    messages.success(request,'Add defect > ' + objModeldefect1.defect_name + ',' + objModeldefect2.defect_name + ',' + objModeldefect3.defect_name + ',' + objModeldefect4.defect_name + ' < in model > ' + inputModelCode + ' < successfully.')
+    return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+    'inputModelDesc':inputModelDesc,
+    'inputModelName':inputModelName,
+    'inputModelCode':inputModelCode,
+    'inputModelImage':inputModelImage,
+    'defects':data_defect,
+    'counter':counter})
+
+def add_defect45(request):
+    
+    point_defect = 9
+    data_defect = Defect.objects.all()
+    department = request.POST['department']
+
+    datepick = request.POST['datepick']
+    shift = request.POST['shift']
+    status_glass = request.POST['status_glass']
+    
+    
+
+    inputModelDesc = request.POST['inputModelDesc']
+    inputModelName = request.POST['inputModelName']
+    inputModelCode = request.POST['inputModelCode']
+    inputModelImage = request.POST['inputModelImage']
+    inputDefectP9_box5_defect1 = request.POST['inputDefectP9_box5_defect1']
+    inputDefectP9_box5_defect2 = request.POST['inputDefectP9_box5_defect2']
+    inputDefectP9_box5_defect3 = request.POST['inputDefectP9_box5_defect3']
+    inputDefectP9_box5_defect4 = request.POST['inputDefectP9_box5_defect4']
+    inputDefectP9_box5_defect5 = request.POST['inputDefectP9_box5_defect5']
+    
+    
+    objModeldefect1 = Defect.objects.get(id=inputDefectP9_box5_defect1)
+    objModeldefect2 = Defect.objects.get(id=inputDefectP9_box5_defect2)
+    objModeldefect3 = Defect.objects.get(id=inputDefectP9_box5_defect3)
+    objModeldefect4 = Defect.objects.get(id=inputDefectP9_box5_defect4)
+    objModeldefect5 = Defect.objects.get(id=inputDefectP9_box5_defect5)
+
+
+    modelGlassWithDefect_add = modelGlassWithDefect.objects.create(
+                                        date_select = datepick,
+                                        point_defect = point_defect,
+                                        shift = shift,
+                                        model_desc = inputModelDesc,
+                                        model_name = inputModelName,
+                                        model_code = inputModelCode,
+                                        department = department,
+                                        status_glass = status_glass,
+                                        number_glass = counter,
+                                        defect_name1 = objModeldefect1.defect_name,
+                                        defect_name2 = objModeldefect2.defect_name,
+                                        defect_name3 = objModeldefect3.defect_name,
+                                        defect_name4 = objModeldefect4.defect_name,
+                                        defect_name5 = objModeldefect5.defect_name
+                                )
+    modelGlassWithDefect_add.save()
+    
+
+    # data_defect = Defect.objects.all()
+    # data_glass = modelGlass.objects.all()
+
+    # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
+    messages.success(request,'Add defect > ' + objModeldefect1.defect_name + ',' + objModeldefect2.defect_name + ',' + objModeldefect3.defect_name + ',' + objModeldefect4.defect_name + ',' + objModeldefect5.defect_name + ' < in model > ' + inputModelCode + ' < successfully.')
+    return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+    'inputModelDesc':inputModelDesc,
+    'inputModelName':inputModelName,
+    'inputModelCode':inputModelCode,
+    'inputModelImage':inputModelImage,
+    'defects':data_defect,
+    'counter':counter})
+
+
+
+
+def add_defect46(request):
+    
+    point_defect = 10
+    data_defect = Defect.objects.all()
+    department = request.POST['department']
+
+    datepick = request.POST['datepick']
+    shift = request.POST['shift']
+    status_glass = request.POST['status_glass']
+    
+    
+
+    inputModelDesc = request.POST['inputModelDesc']
+    inputModelName = request.POST['inputModelName']
+    inputModelCode = request.POST['inputModelCode']
+    inputModelImage = request.POST['inputModelImage']
+    inputDefectP10_box1_defect1 = request.POST['inputDefectP10_box1_defect1']
+    
+    objModeldefect = Defect.objects.get(id=inputDefectP10_box1_defect1)
+
+
+    modelGlassWithDefect_add = modelGlassWithDefect.objects.create(
+                                        date_select = datepick,
+                                        point_defect = point_defect,
+                                        shift = shift,
+                                        model_desc = inputModelDesc,
+                                        model_name = inputModelName,
+                                        model_code = inputModelCode,
+                                        department = department,
+                                        status_glass = status_glass,
+                                        number_glass = counter,
+                                        defect_name1 = objModeldefect.defect_name
+                                )
+    modelGlassWithDefect_add.save()
+    
+
+    # data_defect = Defect.objects.all()
+    # data_glass = modelGlass.objects.all()
+
+    # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
+    messages.success(request,'Add defect > ' + objModeldefect.defect_name + ' < in model > ' + inputModelCode + ' < successfully.')
+    return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+    'inputModelDesc':inputModelDesc,
+    'inputModelName':inputModelName,
+    'inputModelCode':inputModelCode,
+    'inputModelImage':inputModelImage,
+    'defects':data_defect,
+    'counter':counter})
+
+def add_defect47(request):
+    
+    point_defect = 10
+    data_defect = Defect.objects.all()
+    department = request.POST['department']
+
+    datepick = request.POST['datepick']
+    shift = request.POST['shift']
+    status_glass = request.POST['status_glass']
+    
+    
+
+    inputModelDesc = request.POST['inputModelDesc']
+    inputModelName = request.POST['inputModelName']
+    inputModelCode = request.POST['inputModelCode']
+    inputModelImage = request.POST['inputModelImage']
+    inputDefectP10_box2_defect1 = request.POST['inputDefectP10_box2_defect1']
+    inputDefectP10_box2_defect2 = request.POST['inputDefectP10_box2_defect2']
+    
+    
+    objModeldefect1 = Defect.objects.get(id=inputDefectP10_box2_defect1)
+    objModeldefect2 = Defect.objects.get(id=inputDefectP10_box2_defect2)
+
+
+    modelGlassWithDefect_add = modelGlassWithDefect.objects.create(
+                                        date_select = datepick,
+                                        point_defect = point_defect,
+                                        shift = shift,
+                                        model_desc = inputModelDesc,
+                                        model_name = inputModelName,
+                                        model_code = inputModelCode,
+                                        department = department,
+                                        status_glass = status_glass,
+                                        number_glass = counter,
+                                        defect_name1 = objModeldefect1.defect_name,
+                                        defect_name2 = objModeldefect2.defect_name
+                                )
+    modelGlassWithDefect_add.save()
+    
+
+    # data_defect = Defect.objects.all()
+    # data_glass = modelGlass.objects.all()
+
+    # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
+    messages.success(request,'Add defect > ' + objModeldefect1.defect_name + ',' + objModeldefect2.defect_name + ' < in model > ' + inputModelCode + ' < successfully.')
+    return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+    'inputModelDesc':inputModelDesc,
+    'inputModelName':inputModelName,
+    'inputModelCode':inputModelCode,
+    'inputModelImage':inputModelImage,
+    'defects':data_defect,
+    'counter':counter})
+
+def add_defect48(request):
+    
+    point_defect = 10
+    data_defect = Defect.objects.all()
+    department = request.POST['department']
+
+    datepick = request.POST['datepick']
+    shift = request.POST['shift']
+    status_glass = request.POST['status_glass']
+    
+    
+
+    inputModelDesc = request.POST['inputModelDesc']
+    inputModelName = request.POST['inputModelName']
+    inputModelCode = request.POST['inputModelCode']
+    inputModelImage = request.POST['inputModelImage']
+    inputDefectP10_box3_defect1 = request.POST['inputDefectP10_box3_defect1']
+    inputDefectP10_box3_defect2 = request.POST['inputDefectP10_box3_defect2']
+    inputDefectP10_box3_defect3 = request.POST['inputDefectP10_box3_defect3']
+    
+    
+    objModeldefect1 = Defect.objects.get(id=inputDefectP10_box3_defect1)
+    objModeldefect2 = Defect.objects.get(id=inputDefectP10_box3_defect2)
+    objModeldefect3 = Defect.objects.get(id=inputDefectP10_box3_defect3)
+
+    modelGlassWithDefect_add = modelGlassWithDefect.objects.create(
+                                        date_select = datepick,
+                                        point_defect = point_defect,
+                                        shift = shift,
+                                        model_desc = inputModelDesc,
+                                        model_name = inputModelName,
+                                        model_code = inputModelCode,
+                                        department = department,
+                                        status_glass = status_glass,
+                                        number_glass = counter,
+                                        defect_name1 = objModeldefect1.defect_name,
+                                        defect_name2 = objModeldefect2.defect_name,
+                                        defect_name3 = objModeldefect3.defect_name
+                                )
+    modelGlassWithDefect_add.save()
+    
+
+    # data_defect = Defect.objects.all()
+    # data_glass = modelGlass.objects.all()
+
+    # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
+    messages.success(request,'Add defect > ' + objModeldefect1.defect_name + ',' + objModeldefect2.defect_name + ',' + objModeldefect3.defect_name + ' < in model > ' + inputModelCode + ' < successfully.')
+    return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+    'inputModelDesc':inputModelDesc,
+    'inputModelName':inputModelName,
+    'inputModelCode':inputModelCode,
+    'inputModelImage':inputModelImage,
+    'defects':data_defect,
+    'counter':counter})
+
+def add_defect49(request):
+    
+    point_defect = 10
+    data_defect = Defect.objects.all()
+    department = request.POST['department']
+
+    datepick = request.POST['datepick']
+    shift = request.POST['shift']
+    status_glass = request.POST['status_glass']
+    
+    
+
+    inputModelDesc = request.POST['inputModelDesc']
+    inputModelName = request.POST['inputModelName']
+    inputModelCode = request.POST['inputModelCode']
+    inputModelImage = request.POST['inputModelImage']
+    inputDefectP10_box4_defect1 = request.POST['inputDefectP10_box4_defect1']
+    inputDefectP10_box4_defect2 = request.POST['inputDefectP10_box4_defect2']
+    inputDefectP10_box4_defect3 = request.POST['inputDefectP10_box4_defect3']
+    inputDefectP10_box4_defect4 = request.POST['inputDefectP10_box4_defect4']
+    
+    
+    objModeldefect1 = Defect.objects.get(id=inputDefectP10_box4_defect1)
+    objModeldefect2 = Defect.objects.get(id=inputDefectP10_box4_defect2)
+    objModeldefect3 = Defect.objects.get(id=inputDefectP10_box4_defect3)
+    objModeldefect4 = Defect.objects.get(id=inputDefectP10_box4_defect4)
+
+
+    modelGlassWithDefect_add = modelGlassWithDefect.objects.create(
+                                        date_select = datepick,
+                                        point_defect = point_defect,
+                                        shift = shift,
+                                        model_desc = inputModelDesc,
+                                        model_name = inputModelName,
+                                        model_code = inputModelCode,
+                                        department = department,
+                                        status_glass = status_glass,
+                                        number_glass = counter,
+                                        defect_name1 = objModeldefect1.defect_name,
+                                        defect_name2 = objModeldefect2.defect_name,
+                                        defect_name3 = objModeldefect3.defect_name,
+                                        defect_name4 = objModeldefect4.defect_name
+                                )
+    modelGlassWithDefect_add.save()
+    
+
+    # data_defect = Defect.objects.all()
+    # data_glass = modelGlass.objects.all()
+
+    # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
+    messages.success(request,'Add defect > ' + objModeldefect1.defect_name + ',' + objModeldefect2.defect_name + ',' + objModeldefect3.defect_name + ',' + objModeldefect4.defect_name + ' < in model > ' + inputModelCode + ' < successfully.')
+    return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+    'inputModelDesc':inputModelDesc,
+    'inputModelName':inputModelName,
+    'inputModelCode':inputModelCode,
+    'inputModelImage':inputModelImage,
+    'defects':data_defect,
+    'counter':counter})
+
+def add_defect50(request):
+    
+    point_defect = 10
+    data_defect = Defect.objects.all()
+    department = request.POST['department']
+
+    datepick = request.POST['datepick']
+    shift = request.POST['shift']
+    status_glass = request.POST['status_glass']
+    
+    
+
+    inputModelDesc = request.POST['inputModelDesc']
+    inputModelName = request.POST['inputModelName']
+    inputModelCode = request.POST['inputModelCode']
+    inputModelImage = request.POST['inputModelImage']
+    inputDefectP10_box5_defect1 = request.POST['inputDefectP10_box5_defect1']
+    inputDefectP10_box5_defect2 = request.POST['inputDefectP10_box5_defect2']
+    inputDefectP10_box5_defect3 = request.POST['inputDefectP10_box5_defect3']
+    inputDefectP10_box5_defect4 = request.POST['inputDefectP10_box5_defect4']
+    inputDefectP10_box5_defect5 = request.POST['inputDefectP10_box5_defect5']
+    
+    
+    objModeldefect1 = Defect.objects.get(id=inputDefectP10_box5_defect1)
+    objModeldefect2 = Defect.objects.get(id=inputDefectP10_box5_defect2)
+    objModeldefect3 = Defect.objects.get(id=inputDefectP10_box5_defect3)
+    objModeldefect4 = Defect.objects.get(id=inputDefectP10_box5_defect4)
+    objModeldefect5 = Defect.objects.get(id=inputDefectP10_box5_defect5)
+
+
+    modelGlassWithDefect_add = modelGlassWithDefect.objects.create(
+                                        date_select = datepick,
+                                        point_defect = point_defect,
+                                        shift = shift,
+                                        model_desc = inputModelDesc,
+                                        model_name = inputModelName,
+                                        model_code = inputModelCode,
+                                        department = department,
+                                        status_glass = status_glass,
+                                        number_glass = counter,
+                                        defect_name1 = objModeldefect1.defect_name,
+                                        defect_name2 = objModeldefect2.defect_name,
+                                        defect_name3 = objModeldefect3.defect_name,
+                                        defect_name4 = objModeldefect4.defect_name,
+                                        defect_name5 = objModeldefect5.defect_name
+                                )
+    modelGlassWithDefect_add.save()
+    
+
+    # data_defect = Defect.objects.all()
+    # data_glass = modelGlass.objects.all()
+
+    # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
+    messages.success(request,'Add defect > ' + objModeldefect1.defect_name + ',' + objModeldefect2.defect_name + ',' + objModeldefect3.defect_name + ',' + objModeldefect4.defect_name + ',' + objModeldefect5.defect_name + ' < in model > ' + inputModelCode + ' < successfully.')
+    return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+    'inputModelDesc':inputModelDesc,
+    'inputModelName':inputModelName,
+    'inputModelCode':inputModelCode,
+    'inputModelImage':inputModelImage,
+    'defects':data_defect,
+    'counter':counter})
+
+
+
+
+def add_defect51(request):
+    
+    point_defect = 11
+    data_defect = Defect.objects.all()
+    department = request.POST['department']
+
+    datepick = request.POST['datepick']
+    shift = request.POST['shift']
+    status_glass = request.POST['status_glass']
+    
+    
+
+    inputModelDesc = request.POST['inputModelDesc']
+    inputModelName = request.POST['inputModelName']
+    inputModelCode = request.POST['inputModelCode']
+    inputModelImage = request.POST['inputModelImage']
+    inputDefectP11_box1_defect1 = request.POST['inputDefectP11_box1_defect1']
+    
+    objModeldefect = Defect.objects.get(id=inputDefectP11_box1_defect1)
+
+
+    modelGlassWithDefect_add = modelGlassWithDefect.objects.create(
+                                        date_select = datepick,
+                                        point_defect = point_defect,
+                                        shift = shift,
+                                        model_desc = inputModelDesc,
+                                        model_name = inputModelName,
+                                        model_code = inputModelCode,
+                                        department = department,
+                                        status_glass = status_glass,
+                                        number_glass = counter,
+                                        defect_name1 = objModeldefect.defect_name
+                                )
+    modelGlassWithDefect_add.save()
+    
+
+    # data_defect = Defect.objects.all()
+    # data_glass = modelGlass.objects.all()
+
+    # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
+    messages.success(request,'Add defect > ' + objModeldefect.defect_name + ' < in model > ' + inputModelCode + ' < successfully.')
+    return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+    'inputModelDesc':inputModelDesc,
+    'inputModelName':inputModelName,
+    'inputModelCode':inputModelCode,
+    'inputModelImage':inputModelImage,
+    'defects':data_defect,
+    'counter':counter})
+
+def add_defect52(request):
+    
+    point_defect = 11
+    data_defect = Defect.objects.all()
+    department = request.POST['department']
+
+    datepick = request.POST['datepick']
+    shift = request.POST['shift']
+    status_glass = request.POST['status_glass']
+    
+    
+
+    inputModelDesc = request.POST['inputModelDesc']
+    inputModelName = request.POST['inputModelName']
+    inputModelCode = request.POST['inputModelCode']
+    inputModelImage = request.POST['inputModelImage']
+    inputDefectP11_box2_defect1 = request.POST['inputDefectP11_box2_defect1']
+    inputDefectP11_box2_defect2 = request.POST['inputDefectP11_box2_defect2']
+    
+    
+    objModeldefect1 = Defect.objects.get(id=inputDefectP11_box2_defect1)
+    objModeldefect2 = Defect.objects.get(id=inputDefectP11_box2_defect2)
+
+
+    modelGlassWithDefect_add = modelGlassWithDefect.objects.create(
+                                        date_select = datepick,
+                                        point_defect = point_defect,
+                                        shift = shift,
+                                        model_desc = inputModelDesc,
+                                        model_name = inputModelName,
+                                        model_code = inputModelCode,
+                                        department = department,
+                                        status_glass = status_glass,
+                                        number_glass = counter,
+                                        defect_name1 = objModeldefect1.defect_name,
+                                        defect_name2 = objModeldefect2.defect_name
+                                )
+    modelGlassWithDefect_add.save()
+    
+
+    # data_defect = Defect.objects.all()
+    # data_glass = modelGlass.objects.all()
+
+    # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
+    messages.success(request,'Add defect > ' + objModeldefect1.defect_name + ',' + objModeldefect2.defect_name + ' < in model > ' + inputModelCode + ' < successfully.')
+    return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+    'inputModelDesc':inputModelDesc,
+    'inputModelName':inputModelName,
+    'inputModelCode':inputModelCode,
+    'inputModelImage':inputModelImage,
+    'defects':data_defect,
+    'counter':counter})
+
+def add_defect53(request):
+    
+    point_defect = 11
+    data_defect = Defect.objects.all()
+    department = request.POST['department']
+
+    datepick = request.POST['datepick']
+    shift = request.POST['shift']
+    status_glass = request.POST['status_glass']
+    
+    
+
+    inputModelDesc = request.POST['inputModelDesc']
+    inputModelName = request.POST['inputModelName']
+    inputModelCode = request.POST['inputModelCode']
+    inputModelImage = request.POST['inputModelImage']
+    inputDefectP11_box3_defect1 = request.POST['inputDefectP11_box3_defect1']
+    inputDefectP11_box3_defect2 = request.POST['inputDefectP11_box3_defect2']
+    inputDefectP11_box3_defect3 = request.POST['inputDefectP11_box3_defect3']
+    
+    
+    objModeldefect1 = Defect.objects.get(id=inputDefectP11_box3_defect1)
+    objModeldefect2 = Defect.objects.get(id=inputDefectP11_box3_defect2)
+    objModeldefect3 = Defect.objects.get(id=inputDefectP11_box3_defect3)
+
+    modelGlassWithDefect_add = modelGlassWithDefect.objects.create(
+                                        date_select = datepick,
+                                        point_defect = point_defect,
+                                        shift = shift,
+                                        model_desc = inputModelDesc,
+                                        model_name = inputModelName,
+                                        model_code = inputModelCode,
+                                        department = department,
+                                        status_glass = status_glass,
+                                        number_glass = counter,
+                                        defect_name1 = objModeldefect1.defect_name,
+                                        defect_name2 = objModeldefect2.defect_name,
+                                        defect_name3 = objModeldefect3.defect_name
+                                )
+    modelGlassWithDefect_add.save()
+    
+
+    # data_defect = Defect.objects.all()
+    # data_glass = modelGlass.objects.all()
+
+    # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
+    messages.success(request,'Add defect > ' + objModeldefect1.defect_name + ',' + objModeldefect2.defect_name + ',' + objModeldefect3.defect_name + ' < in model > ' + inputModelCode + ' < successfully.')
+    return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+    'inputModelDesc':inputModelDesc,
+    'inputModelName':inputModelName,
+    'inputModelCode':inputModelCode,
+    'inputModelImage':inputModelImage,
+    'defects':data_defect,
+    'counter':counter})
+
+def add_defect54(request):
+    
+    point_defect = 11
+    data_defect = Defect.objects.all()
+    department = request.POST['department']
+
+    datepick = request.POST['datepick']
+    shift = request.POST['shift']
+    status_glass = request.POST['status_glass']
+    
+    
+
+    inputModelDesc = request.POST['inputModelDesc']
+    inputModelName = request.POST['inputModelName']
+    inputModelCode = request.POST['inputModelCode']
+    inputModelImage = request.POST['inputModelImage']
+    inputDefectP11_box4_defect1 = request.POST['inputDefectP11_box4_defect1']
+    inputDefectP11_box4_defect2 = request.POST['inputDefectP11_box4_defect2']
+    inputDefectP11_box4_defect3 = request.POST['inputDefectP11_box4_defect3']
+    inputDefectP11_box4_defect4 = request.POST['inputDefectP11_box4_defect4']
+    
+    
+    objModeldefect1 = Defect.objects.get(id=inputDefectP11_box4_defect1)
+    objModeldefect2 = Defect.objects.get(id=inputDefectP11_box4_defect2)
+    objModeldefect3 = Defect.objects.get(id=inputDefectP11_box4_defect3)
+    objModeldefect4 = Defect.objects.get(id=inputDefectP11_box4_defect4)
+
+
+    modelGlassWithDefect_add = modelGlassWithDefect.objects.create(
+                                        date_select = datepick,
+                                        point_defect = point_defect,
+                                        shift = shift,
+                                        model_desc = inputModelDesc,
+                                        model_name = inputModelName,
+                                        model_code = inputModelCode,
+                                        department = department,
+                                        status_glass = status_glass,
+                                        number_glass = counter,
+                                        defect_name1 = objModeldefect1.defect_name,
+                                        defect_name2 = objModeldefect2.defect_name,
+                                        defect_name3 = objModeldefect3.defect_name,
+                                        defect_name4 = objModeldefect4.defect_name
+                                )
+    modelGlassWithDefect_add.save()
+    
+
+    # data_defect = Defect.objects.all()
+    # data_glass = modelGlass.objects.all()
+
+    # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
+    messages.success(request,'Add defect > ' + objModeldefect1.defect_name + ',' + objModeldefect2.defect_name + ',' + objModeldefect3.defect_name + ',' + objModeldefect4.defect_name + ' < in model > ' + inputModelCode + ' < successfully.')
+    return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+    'inputModelDesc':inputModelDesc,
+    'inputModelName':inputModelName,
+    'inputModelCode':inputModelCode,
+    'inputModelImage':inputModelImage,
+    'defects':data_defect,
+    'counter':counter})
+
+def add_defect55(request):
+    
+    point_defect = 11
+    data_defect = Defect.objects.all()
+    department = request.POST['department']
+
+    datepick = request.POST['datepick']
+    shift = request.POST['shift']
+    status_glass = request.POST['status_glass']
+    
+    
+
+    inputModelDesc = request.POST['inputModelDesc']
+    inputModelName = request.POST['inputModelName']
+    inputModelCode = request.POST['inputModelCode']
+    inputModelImage = request.POST['inputModelImage']
+    inputDefectP11_box5_defect1 = request.POST['inputDefectP11_box5_defect1']
+    inputDefectP11_box5_defect2 = request.POST['inputDefectP11_box5_defect2']
+    inputDefectP11_box5_defect3 = request.POST['inputDefectP11_box5_defect3']
+    inputDefectP11_box5_defect4 = request.POST['inputDefectP11_box5_defect4']
+    inputDefectP11_box5_defect5 = request.POST['inputDefectP11_box5_defect5']
+    
+    
+    objModeldefect1 = Defect.objects.get(id=inputDefectP11_box5_defect1)
+    objModeldefect2 = Defect.objects.get(id=inputDefectP11_box5_defect2)
+    objModeldefect3 = Defect.objects.get(id=inputDefectP11_box5_defect3)
+    objModeldefect4 = Defect.objects.get(id=inputDefectP11_box5_defect4)
+    objModeldefect5 = Defect.objects.get(id=inputDefectP11_box5_defect5)
+
+
+    modelGlassWithDefect_add = modelGlassWithDefect.objects.create(
+                                        date_select = datepick,
+                                        point_defect = point_defect,
+                                        shift = shift,
+                                        model_desc = inputModelDesc,
+                                        model_name = inputModelName,
+                                        model_code = inputModelCode,
+                                        department = department,
+                                        status_glass = status_glass,
+                                        number_glass = counter,
+                                        defect_name1 = objModeldefect1.defect_name,
+                                        defect_name2 = objModeldefect2.defect_name,
+                                        defect_name3 = objModeldefect3.defect_name,
+                                        defect_name4 = objModeldefect4.defect_name,
+                                        defect_name5 = objModeldefect5.defect_name
+                                )
+    modelGlassWithDefect_add.save()
+    
+
+    # data_defect = Defect.objects.all()
+    # data_glass = modelGlass.objects.all()
+
+    # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
+    messages.success(request,'Add defect > ' + objModeldefect1.defect_name + ',' + objModeldefect2.defect_name + ',' + objModeldefect3.defect_name + ',' + objModeldefect4.defect_name + ',' + objModeldefect5.defect_name + ' < in model > ' + inputModelCode + ' < successfully.')
+    return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+    'inputModelDesc':inputModelDesc,
+    'inputModelName':inputModelName,
+    'inputModelCode':inputModelCode,
+    'inputModelImage':inputModelImage,
+    'defects':data_defect,
+    'counter':counter})
+
+
+
+
+
+def add_defect56(request):
+    
+   
+    point_defect = 12
+    data_defect = Defect.objects.all()
+    department = request.POST['department']
+
+    datepick = request.POST['datepick']
+    shift = request.POST['shift']
+    status_glass = request.POST['status_glass']
+    
+    
+
+    inputModelDesc = request.POST['inputModelDesc']
+    inputModelName = request.POST['inputModelName']
+    inputModelCode = request.POST['inputModelCode']
+    inputModelImage = request.POST['inputModelImage']
+    inputDefectP12_box1_defect1 = request.POST['inputDefectP12_box1_defect1']
+    
+    objModeldefect = Defect.objects.get(id=inputDefectP12_box1_defect1)
+
+
+    modelGlassWithDefect_add = modelGlassWithDefect.objects.create(
+                                        date_select = datepick,
+                                        point_defect = point_defect,
+                                        shift = shift,
+                                        model_desc = inputModelDesc,
+                                        model_name = inputModelName,
+                                        model_code = inputModelCode,
+                                        department = department,
+                                        status_glass = status_glass,
+                                        number_glass = counter,
+                                        defect_name1 = objModeldefect.defect_name
+                                )
+    modelGlassWithDefect_add.save()
+    
+
+    # data_defect = Defect.objects.all()
+    # data_glass = modelGlass.objects.all()
+
+    # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
+    messages.success(request,'Add defect > ' + objModeldefect.defect_name + ' < in model > ' + inputModelCode + ' < successfully.')
+    return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+    'inputModelDesc':inputModelDesc,
+    'inputModelName':inputModelName,
+    'inputModelCode':inputModelCode,
+    'inputModelImage':inputModelImage,
+    'defects':data_defect,
+    'counter':counter})
+
+def add_defect57(request):
+    
+    point_defect = 12
+    data_defect = Defect.objects.all()
+    department = request.POST['department']
+
+    datepick = request.POST['datepick']
+    shift = request.POST['shift']
+    status_glass = request.POST['status_glass']
+    
+    
+
+    inputModelDesc = request.POST['inputModelDesc']
+    inputModelName = request.POST['inputModelName']
+    inputModelCode = request.POST['inputModelCode']
+    inputModelImage = request.POST['inputModelImage']
+    inputDefectP12_box2_defect1 = request.POST['inputDefectP12_box2_defect1']
+    inputDefectP12_box2_defect2 = request.POST['inputDefectP12_box2_defect2']
+    
+    
+    objModeldefect1 = Defect.objects.get(id=inputDefectP12_box2_defect1)
+    objModeldefect2 = Defect.objects.get(id=inputDefectP12_box2_defect2)
+
+
+    modelGlassWithDefect_add = modelGlassWithDefect.objects.create(
+                                        date_select = datepick,
+                                        point_defect = point_defect,
+                                        shift = shift,
+                                        model_desc = inputModelDesc,
+                                        model_name = inputModelName,
+                                        model_code = inputModelCode,
+                                        department = department,
+                                        status_glass = status_glass,
+                                        number_glass = counter,
+                                        defect_name1 = objModeldefect1.defect_name,
+                                        defect_name2 = objModeldefect2.defect_name
+                                )
+    modelGlassWithDefect_add.save()
+    
+
+    # data_defect = Defect.objects.all()
+    # data_glass = modelGlass.objects.all()
+
+    # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
+    messages.success(request,'Add defect > ' + objModeldefect1.defect_name + ',' + objModeldefect2.defect_name + ' < in model > ' + inputModelCode + ' < successfully.')
+    return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+    'inputModelDesc':inputModelDesc,
+    'inputModelName':inputModelName,
+    'inputModelCode':inputModelCode,
+    'inputModelImage':inputModelImage,
+    'defects':data_defect,
+    'counter':counter})
+
+def add_defect58(request):
+    
+    point_defect = 12
+    data_defect = Defect.objects.all()
+    department = request.POST['department']
+
+    datepick = request.POST['datepick']
+    shift = request.POST['shift']
+    status_glass = request.POST['status_glass']
+    
+    
+
+    inputModelDesc = request.POST['inputModelDesc']
+    inputModelName = request.POST['inputModelName']
+    inputModelCode = request.POST['inputModelCode']
+    inputModelImage = request.POST['inputModelImage']
+    inputDefectP12_box3_defect1 = request.POST['inputDefectP12_box3_defect1']
+    inputDefectP12_box3_defect2 = request.POST['inputDefectP12_box3_defect2']
+    inputDefectP12_box3_defect3 = request.POST['inputDefectP12_box3_defect3']
+    
+    
+    objModeldefect1 = Defect.objects.get(id=inputDefectP12_box3_defect1)
+    objModeldefect2 = Defect.objects.get(id=inputDefectP12_box3_defect2)
+    objModeldefect3 = Defect.objects.get(id=inputDefectP12_box3_defect3)
+
+    modelGlassWithDefect_add = modelGlassWithDefect.objects.create(
+                                        date_select = datepick,
+                                        point_defect = point_defect,
+                                        shift = shift,
+                                        model_desc = inputModelDesc,
+                                        model_name = inputModelName,
+                                        model_code = inputModelCode,
+                                        department = department,
+                                        status_glass = status_glass,
+                                        number_glass = counter,
+                                        defect_name1 = objModeldefect1.defect_name,
+                                        defect_name2 = objModeldefect2.defect_name,
+                                        defect_name3 = objModeldefect3.defect_name
+                                )
+    modelGlassWithDefect_add.save()
+    
+
+    # data_defect = Defect.objects.all()
+    # data_glass = modelGlass.objects.all()
+
+    # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
+    messages.success(request,'Add defect > ' + objModeldefect1.defect_name + ',' + objModeldefect2.defect_name + ',' + objModeldefect3.defect_name + ' < in model > ' + inputModelCode + ' < successfully.')
+    return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+    'inputModelDesc':inputModelDesc,
+    'inputModelName':inputModelName,
+    'inputModelCode':inputModelCode,
+    'inputModelImage':inputModelImage,
+    'defects':data_defect,
+    'counter':counter})
+
+def add_defect59(request):
+    
+    point_defect = 12
+    data_defect = Defect.objects.all()
+    department = request.POST['department']
+
+    datepick = request.POST['datepick']
+    shift = request.POST['shift']
+    status_glass = request.POST['status_glass']
+    
+    
+
+    inputModelDesc = request.POST['inputModelDesc']
+    inputModelName = request.POST['inputModelName']
+    inputModelCode = request.POST['inputModelCode']
+    inputModelImage = request.POST['inputModelImage']
+    inputDefectP12_box4_defect1 = request.POST['inputDefectP12_box4_defect1']
+    inputDefectP12_box4_defect2 = request.POST['inputDefectP12_box4_defect2']
+    inputDefectP12_box4_defect3 = request.POST['inputDefectP12_box4_defect3']
+    inputDefectP12_box4_defect4 = request.POST['inputDefectP12_box4_defect4']
+    
+    
+    objModeldefect1 = Defect.objects.get(id=inputDefectP12_box4_defect1)
+    objModeldefect2 = Defect.objects.get(id=inputDefectP12_box4_defect2)
+    objModeldefect3 = Defect.objects.get(id=inputDefectP12_box4_defect3)
+    objModeldefect4 = Defect.objects.get(id=inputDefectP12_box4_defect4)
+
+
+    modelGlassWithDefect_add = modelGlassWithDefect.objects.create(
+                                        date_select = datepick,
+                                        point_defect = point_defect,
+                                        shift = shift,
+                                        model_desc = inputModelDesc,
+                                        model_name = inputModelName,
+                                        model_code = inputModelCode,
+                                        department = department,
+                                        status_glass = status_glass,
+                                        number_glass = counter,
+                                        defect_name1 = objModeldefect1.defect_name,
+                                        defect_name2 = objModeldefect2.defect_name,
+                                        defect_name3 = objModeldefect3.defect_name,
+                                        defect_name4 = objModeldefect4.defect_name
+                                )
+    modelGlassWithDefect_add.save()
+    
+
+    # data_defect = Defect.objects.all()
+    # data_glass = modelGlass.objects.all()
+
+    # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
+    messages.success(request,'Add defect > ' + objModeldefect1.defect_name + ',' + objModeldefect2.defect_name + ',' + objModeldefect3.defect_name + ',' + objModeldefect4.defect_name + ' < in model > ' + inputModelCode + ' < successfully.')
+    return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+    'inputModelDesc':inputModelDesc,
+    'inputModelName':inputModelName,
+    'inputModelCode':inputModelCode,
+    'inputModelImage':inputModelImage,
+    'defects':data_defect,
+    'counter':counter})
+
+def add_defect60(request):
+    
+    point_defect = 12
+    data_defect = Defect.objects.all()
+    department = request.POST['department']
+
+    datepick = request.POST['datepick']
+    shift = request.POST['shift']
+    status_glass = request.POST['status_glass']
+    
+    
+
+    inputModelDesc = request.POST['inputModelDesc']
+    inputModelName = request.POST['inputModelName']
+    inputModelCode = request.POST['inputModelCode']
+    inputModelImage = request.POST['inputModelImage']
+    inputDefectP12_box5_defect1 = request.POST['inputDefectP12_box5_defect1']
+    inputDefectP12_box5_defect2 = request.POST['inputDefectP12_box5_defect2']
+    inputDefectP12_box5_defect3 = request.POST['inputDefectP12_box5_defect3']
+    inputDefectP12_box5_defect4 = request.POST['inputDefectP12_box5_defect4']
+    inputDefectP12_box5_defect5 = request.POST['inputDefectP12_box5_defect5']
+    
+    
+    objModeldefect1 = Defect.objects.get(id=inputDefectP12_box5_defect1)
+    objModeldefect2 = Defect.objects.get(id=inputDefectP12_box5_defect2)
+    objModeldefect3 = Defect.objects.get(id=inputDefectP12_box5_defect3)
+    objModeldefect4 = Defect.objects.get(id=inputDefectP12_box5_defect4)
+    objModeldefect5 = Defect.objects.get(id=inputDefectP12_box5_defect5)
+
+
+    modelGlassWithDefect_add = modelGlassWithDefect.objects.create(
+                                        date_select = datepick,
+                                        point_defect = point_defect,
+                                        shift = shift,
+                                        model_desc = inputModelDesc,
+                                        model_name = inputModelName,
+                                        model_code = inputModelCode,
+                                        department = department,
+                                        status_glass = status_glass,
+                                        number_glass = counter,
+                                        defect_name1 = objModeldefect1.defect_name,
+                                        defect_name2 = objModeldefect2.defect_name,
+                                        defect_name3 = objModeldefect3.defect_name,
+                                        defect_name4 = objModeldefect4.defect_name,
+                                        defect_name5 = objModeldefect5.defect_name
+                                )
+    modelGlassWithDefect_add.save()
+    
+
+    # data_defect = Defect.objects.all()
+    # data_glass = modelGlass.objects.all()
+
+    # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
+    messages.success(request,'Add defect > ' + objModeldefect1.defect_name + ',' + objModeldefect2.defect_name + ',' + objModeldefect3.defect_name + ',' + objModeldefect4.defect_name + ',' + objModeldefect5.defect_name + ' < in model > ' + inputModelCode + ' < successfully.')
+    return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+    'inputModelDesc':inputModelDesc,
+    'inputModelName':inputModelName,
+    'inputModelCode':inputModelCode,
+    'inputModelImage':inputModelImage,
+    'defects':data_defect,
+    'counter':counter})
 
     
 

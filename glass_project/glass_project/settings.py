@@ -87,15 +87,27 @@ DATABASES = {
         # 'PORT': '3306',
 
 
-        # for window
+        # # for window xxamp เก่า
+        # 'ENGINE': 'django.db.backends.mysql', 
+        # 'NAME': 'glass_project',
+        # 'USER': 'adminjo',
+        # 'PASSWORD': 'itpwd8501',
+
+        # # on host mk.jsr.co.th
+        # 'HOST': '200.1.1.52',
+        # 'PORT': '3307',
+
+
+
+         # for window IIS
         'ENGINE': 'django.db.backends.mysql', 
         'NAME': 'glass_project',
-        'USER': 'adminjo',
+        'USER': 'admin',
         'PASSWORD': 'itpwd8501',
 
         # on host mk.jsr.co.th
         'HOST': '200.1.1.52',
-        'PORT': '3307',
+        'PORT': '3306',
 
 
         # for window and server is on host open

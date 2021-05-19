@@ -38,9 +38,13 @@ class modelGlassWithDefect(models.Model):
     defect_name3 = models.CharField(max_length=200,null=True)
     defect_name4 = models.CharField(max_length=200,null=True)
     defect_name5 = models.CharField(max_length=200,null=True)
+    department = models.CharField(max_length=200,null=True)
+    point_defect = models.CharField(max_length=200,null=True)
     date_select = models.DateField()
     shift = models.CharField(max_length=200)
-    department = models.CharField(max_length=200)
+    number_glass = models.CharField(max_length=200,null=True)
+    status_glass = models.CharField(max_length=200,null=True)
+    
     
 
     
