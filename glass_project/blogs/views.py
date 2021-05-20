@@ -8,7 +8,11 @@ from django.core.files.storage import FileSystemStorage
 
 
 counter = 0
+counter = 1
 datepick_for_check = 0
+
+status_defect_for_check = 0   # 0 คือ ไม่มี defect  /  1  คือ พบ defect
+status_defect_to_nodefect = 0   # 0 คือ ไม่มี defect  /  1  คือ พบ defect
 
 
 def hello(request):
@@ -148,10 +152,10 @@ def choose_defect_on_glass(request):
     datepick = request.POST['datepicker']
 
     if datepick != datepick_for_check :
-        counter = 0
+        counter = 1
        
 
-    datepick_for_check = datepick
+    # datepick_for_check = datepick
 
     
     
@@ -172,102 +176,186 @@ def choose_defect_on_glass(request):
     'inputModelCode':objModelDesc.model_code,
     'inputModelImage':objModelDesc.model_image,
     'defects':data_defect,
-    'counter':counter })
+    'datepick_for_check' : datepick_for_check,
+    'counter':counter}
+    )
 
 
 def add_have_defect(request):
     global counter
     global datepick_for_check
-    
+    global status_defect_for_check
+    global status_defect_to_nodefect
+
     data_defect = Defect.objects.all()
     department = request.POST['department']
     datepick = request.POST['datepick']
-
-    if datepick == datepick_for_check :
-        counter += 1
-    else:
-        counter = 1
-        
     shift = request.POST['shift']
     status_glass = request.POST['status_glass']
     inputModelDesc = request.POST['inputModelDesc']
     inputModelName = request.POST['inputModelName']
     inputModelCode = request.POST['inputModelCode']
     inputModelImage = request.POST['inputModelImage']
+    status_defect_to_nodefect = 1
 
-     
-    messages.success(request,'Add defect in model > ' + inputModelCode + ' < successfully.')
-    return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
-    'inputModelDesc':inputModelDesc,
-    'inputModelName':inputModelName,
-    'inputModelCode':inputModelCode,
-    'inputModelImage':inputModelImage,
-    'defects':data_defect,
-    'counter':counter})
+    if status_defect_for_check == 1 :
+
+        
+        if datepick == datepick_for_check :
+            counter = counter + 1
+        else:
+            counter = counter
+            
+
+        status_defect_for_check = 0
+        messages.success(request,'Add defect in model > ' + inputModelCode + ' < successfully.')
+        return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+        'inputModelDesc':inputModelDesc,
+        'inputModelName':inputModelName,
+        'inputModelCode':inputModelCode,
+        'inputModelImage':inputModelImage,
+        'defects':data_defect,
+    'datepick_for_check' : datepick_for_check,
+        'counter':counter})
+
+    else:
+        messages.error(request, 'Please, choose defect before save.')
+        return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+        'inputModelDesc':inputModelDesc,
+        'inputModelName':inputModelName,
+        'inputModelCode':inputModelCode,
+        'inputModelImage':inputModelImage,
+        'defects':data_defect,
+    'datepick_for_check' : datepick_for_check,
+        'counter':counter})
+
 
 def add_no_defect(request):
     global counter
     global datepick_for_check
+    global status_defect_for_check
+    global status_defect_to_nodefect
     
     data_defect = Defect.objects.all()
     department = request.POST['department']
     datepick = request.POST['datepick']
-
-    if datepick == datepick_for_check :
-        counter += 1
-    else:
-        counter = 1
-        
-
     shift = request.POST['shift']
     status_glass = request.POST['status_glass']
-    
-
     inputModelDesc = request.POST['inputModelDesc']
     inputModelName = request.POST['inputModelName']
     inputModelCode = request.POST['inputModelCode']
     inputModelImage = request.POST['inputModelImage']
 
 
-    modelGlassWithDefect_add = modelGlassWithDefect.objects.create(
-                                        date_select = datepick,
-                                        shift = shift,
-                                        model_desc = inputModelDesc,
-                                        model_name = inputModelName,
-                                        model_code = inputModelCode,
-                                        department = department,
-                                        number_glass = counter,
-                                        status_glass = status_glass
-                                                                                
-                                )
-    modelGlassWithDefect_add.save()
-    
+    if status_defect_for_check == 0 :
 
-    # data_defect = Defect.objects.all()
-    # data_glass = modelGlass.objects.all()
+        if status_defect_to_nodefect == 1:
+            counter = request.POST['counter']
+            counter = int(counter)
+            datepick_for_check = datepick
 
-    # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
-    messages.success(request,'Add No defect in model > ' + inputModelCode + ' < successfully.')
-    return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
-    'inputModelDesc':inputModelDesc,
-    'inputModelName':inputModelName,
-    'inputModelCode':inputModelCode,
-    'inputModelImage':inputModelImage,
-    'defects':data_defect,
-    'counter':counter})
+
+            modelGlassWithDefect_add = modelGlassWithDefect.objects.create(
+                                                date_select = datepick,
+                                                shift = shift,
+                                                model_desc = inputModelDesc,
+                                                model_name = inputModelName,
+                                                model_code = inputModelCode,
+                                                department = department,
+                                                number_glass = counter,
+                                                status_glass = status_glass
+                                                                                        
+                                        )
+            modelGlassWithDefect_add.save()
+
+            
+            status_defect_to_nodefect = 0
+            
+            
+        # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
+            messages.success(request,'Add No defect in model > ' + inputModelCode + ' < successfully.')
+            return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+            'inputModelDesc':inputModelDesc,
+            'inputModelName':inputModelName,
+            'inputModelCode':inputModelCode,
+            'inputModelImage':inputModelImage,
+            'defects':data_defect,
+        'datepick_for_check' : datepick_for_check,
+            'counter':counter + 1})
+
+            
+
+        else:    
+
+            
+
+            if datepick == datepick_for_check :
+                counter = counter + 1
+            else:
+                counter = counter
+                
+
+            datepick_for_check = datepick
+
+
+            modelGlassWithDefect_add = modelGlassWithDefect.objects.create(
+                                                date_select = datepick,
+                                                shift = shift,
+                                                model_desc = inputModelDesc,
+                                                model_name = inputModelName,
+                                                model_code = inputModelCode,
+                                                department = department,
+                                                number_glass = counter,
+                                                status_glass = status_glass
+                                                                                        
+                                        )
+            modelGlassWithDefect_add.save()
+            
+        
+            
+        # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
+            messages.success(request,'Add No defect in model > ' + inputModelCode + ' < successfully.')
+            return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+            'inputModelDesc':inputModelDesc,
+            'inputModelName':inputModelName,
+            'inputModelCode':inputModelCode,
+            'inputModelImage':inputModelImage,
+            'defects':data_defect,
+            'datepick_for_check' : datepick_for_check,
+            'counter':counter + 1})
+
+    else:
+        messages.error(request, 'Please, Save and go to next Glass first.')
+        return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
+        'inputModelDesc':inputModelDesc,
+        'inputModelName':inputModelName,
+        'inputModelCode':inputModelCode,
+        'inputModelImage':inputModelImage,
+        'defects':data_defect,
+        'datepick_for_check' : datepick_for_check,
+        'counter':counter})
+
 
 def add_defect1(request):
+    global status_defect_for_check
     global counter
+    global datepick_for_check
 
-    point_defect = 1
+    status_defect_for_check = 1
+    
+    counter = counter
+
     data_defect = Defect.objects.all()
     department = request.POST['department']
-
     datepick = request.POST['datepick']
+
+    
+    
+    point_defect = 1
     shift = request.POST['shift']
     status_glass = request.POST['status_glass']
     
-
+    datepick_for_check = datepick
     inputModelDesc = request.POST['inputModelDesc']
     inputModelName = request.POST['inputModelName']
     inputModelCode = request.POST['inputModelCode']
@@ -280,6 +368,7 @@ def add_defect1(request):
     modelGlassWithDefect_add = modelGlassWithDefect.objects.create(
                                         date_select = datepick,
                                         shift = shift,
+                                        point_defect = point_defect,
                                         model_desc = inputModelDesc,
                                         model_name = inputModelName,
                                         model_code = inputModelCode,
@@ -296,19 +385,28 @@ def add_defect1(request):
     # data_glass = modelGlass.objects.all()
 
     # objModelDesc.model_desc    objModelDesc.model_name    objModelDesc.model_code     เรียกชื่อ attribute (หัว column) โดย ใส่ .
-    messages.success(request,'Add defect > ' + objModeldefect.defect_name + ' < in model > ' + inputModelCode + ' < successfully.')
+    messages.success(request,'Add defect > ' + objModeldefect.defect_name + ' < in model > ' + inputModelCode + '@ glass ' + str(counter) + ' < successfully.'  )
     return render(request,'choose_defect_on_glass.html',{'shift':shift,'datepick':datepick,
     'inputModelDesc':inputModelDesc,
     'inputModelName':inputModelName,
     'inputModelCode':inputModelCode,
     'inputModelImage':inputModelImage,
     'defects':data_defect,
+    'datepick_for_check' : datepick_for_check,
     'counter':counter})
 
 def add_defect2(request):
+
+    global status_defect_for_check
+    global counter
+    global datepick_for_check
+
+    status_defect_for_check = 1
+    
+    counter = counter
     
     
-    point_defect = 1
+    point_defect = 2
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -318,6 +416,7 @@ def add_defect2(request):
     
     
 
+    datepick_for_check = datepick
     inputModelDesc = request.POST['inputModelDesc']
     inputModelName = request.POST['inputModelName']
     inputModelCode = request.POST['inputModelCode']
@@ -358,11 +457,20 @@ def add_defect2(request):
     'inputModelCode':inputModelCode,
     'inputModelImage':inputModelImage,
     'defects':data_defect,
+    'datepick_for_check' : datepick_for_check,
     'counter':counter})
 
 def add_defect3(request):
+
+    global status_defect_for_check
+    global counter
+    global datepick_for_check
+
+    status_defect_for_check = 1
     
-    point_defect = 1
+    counter = counter
+    
+    point_defect = 3
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -372,6 +480,7 @@ def add_defect3(request):
     
     
 
+    datepick_for_check = datepick
     inputModelDesc = request.POST['inputModelDesc']
     inputModelName = request.POST['inputModelName']
     inputModelCode = request.POST['inputModelCode']
@@ -413,11 +522,20 @@ def add_defect3(request):
     'inputModelCode':inputModelCode,
     'inputModelImage':inputModelImage,
     'defects':data_defect,
+    'datepick_for_check' : datepick_for_check,
     'counter':counter})
 
 def add_defect4(request):
+
+    global status_defect_for_check
+    global counter
+    global datepick_for_check
+
+    status_defect_for_check = 1
     
-    point_defect = 1
+    counter = counter
+    
+    point_defect = 4
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -427,6 +545,7 @@ def add_defect4(request):
     
     
 
+    datepick_for_check = datepick
     inputModelDesc = request.POST['inputModelDesc']
     inputModelName = request.POST['inputModelName']
     inputModelCode = request.POST['inputModelCode']
@@ -472,11 +591,20 @@ def add_defect4(request):
     'inputModelCode':inputModelCode,
     'inputModelImage':inputModelImage,
     'defects':data_defect,
+    'datepick_for_check' : datepick_for_check,
     'counter':counter})
 
 def add_defect5(request):
+
+    global status_defect_for_check
+    global counter
+    global datepick_for_check
+
+    status_defect_for_check = 1
     
-    point_defect = 1
+    counter = counter
+    
+    point_defect = 5
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -486,6 +614,7 @@ def add_defect5(request):
     
     
 
+    datepick_for_check = datepick
     inputModelDesc = request.POST['inputModelDesc']
     inputModelName = request.POST['inputModelName']
     inputModelCode = request.POST['inputModelCode']
@@ -534,13 +663,22 @@ def add_defect5(request):
     'inputModelCode':inputModelCode,
     'inputModelImage':inputModelImage,
     'defects':data_defect,
+    'datepick_for_check' : datepick_for_check,
     'counter':counter})
 
 
 def add_defect6(request):
+
+    global status_defect_for_check
+    global counter
+    global datepick_for_check
+
+    status_defect_for_check = 1
+    
+    counter = counter
     
    
-    point_defect = 2
+    point_defect = 6
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -550,6 +688,7 @@ def add_defect6(request):
     
     
 
+    datepick_for_check = datepick
     inputModelDesc = request.POST['inputModelDesc']
     inputModelName = request.POST['inputModelName']
     inputModelCode = request.POST['inputModelCode']
@@ -585,11 +724,20 @@ def add_defect6(request):
     'inputModelCode':inputModelCode,
     'inputModelImage':inputModelImage,
     'defects':data_defect,
+    'datepick_for_check' : datepick_for_check,
     'counter':counter})
 
 def add_defect7(request):
+
+    global status_defect_for_check
+    global counter
+    global datepick_for_check
+
+    status_defect_for_check = 1
     
-    point_defect = 2
+    counter = counter
+    
+    point_defect = 7
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -599,6 +747,7 @@ def add_defect7(request):
     
     
 
+    datepick_for_check = datepick
     inputModelDesc = request.POST['inputModelDesc']
     inputModelName = request.POST['inputModelName']
     inputModelCode = request.POST['inputModelCode']
@@ -638,11 +787,20 @@ def add_defect7(request):
     'inputModelCode':inputModelCode,
     'inputModelImage':inputModelImage,
     'defects':data_defect,
+    'datepick_for_check' : datepick_for_check,
     'counter':counter})
 
 def add_defect8(request):
+
+    global status_defect_for_check
+    global counter
+    global datepick_for_check
+
+    status_defect_for_check = 1
     
-    point_defect = 2
+    counter = counter
+    
+    point_defect = 8
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -652,6 +810,7 @@ def add_defect8(request):
     
     
 
+    datepick_for_check = datepick
     inputModelDesc = request.POST['inputModelDesc']
     inputModelName = request.POST['inputModelName']
     inputModelCode = request.POST['inputModelCode']
@@ -693,11 +852,20 @@ def add_defect8(request):
     'inputModelCode':inputModelCode,
     'inputModelImage':inputModelImage,
     'defects':data_defect,
+    'datepick_for_check' : datepick_for_check,
     'counter':counter})
 
 def add_defect9(request):
+
+    global status_defect_for_check
+    global counter
+    global datepick_for_check
+
+    status_defect_for_check = 1
     
-    point_defect = 2
+    counter = counter
+    
+    point_defect = 9
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -707,6 +875,7 @@ def add_defect9(request):
     
     
 
+    datepick_for_check = datepick
     inputModelDesc = request.POST['inputModelDesc']
     inputModelName = request.POST['inputModelName']
     inputModelCode = request.POST['inputModelCode']
@@ -752,11 +921,20 @@ def add_defect9(request):
     'inputModelCode':inputModelCode,
     'inputModelImage':inputModelImage,
     'defects':data_defect,
+    'datepick_for_check' : datepick_for_check,
     'counter':counter})
 
 def add_defect10(request):
+
+    global status_defect_for_check
+    global counter
+    global datepick_for_check
+
+    status_defect_for_check = 1
     
-    point_defect = 2
+    counter = counter
+    
+    point_defect = 10
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -766,6 +944,7 @@ def add_defect10(request):
     
     
 
+    datepick_for_check = datepick
     inputModelDesc = request.POST['inputModelDesc']
     inputModelName = request.POST['inputModelName']
     inputModelCode = request.POST['inputModelCode']
@@ -814,6 +993,7 @@ def add_defect10(request):
     'inputModelCode':inputModelCode,
     'inputModelImage':inputModelImage,
     'defects':data_defect,
+    'datepick_for_check' : datepick_for_check,
     'counter':counter})
 
 
@@ -826,8 +1006,16 @@ def add_defect10(request):
 
 
 def add_defect11(request):
+
+    global status_defect_for_check
+    global counter
+    global datepick_for_check
+
+    status_defect_for_check = 1
     
-    point_defect = 3
+    counter = counter
+    
+    point_defect = 11
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -837,6 +1025,7 @@ def add_defect11(request):
     
     
 
+    datepick_for_check = datepick
     inputModelDesc = request.POST['inputModelDesc']
     inputModelName = request.POST['inputModelName']
     inputModelCode = request.POST['inputModelCode']
@@ -872,11 +1061,20 @@ def add_defect11(request):
     'inputModelCode':inputModelCode,
     'inputModelImage':inputModelImage,
     'defects':data_defect,
+    'datepick_for_check' : datepick_for_check,
     'counter':counter})
 
 def add_defect12(request):
+
+    global status_defect_for_check
+    global counter
+    global datepick_for_check
+
+    status_defect_for_check = 1
     
-    point_defect = 3
+    counter = counter
+    
+    point_defect = 12
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -886,6 +1084,7 @@ def add_defect12(request):
     
     
 
+    datepick_for_check = datepick
     inputModelDesc = request.POST['inputModelDesc']
     inputModelName = request.POST['inputModelName']
     inputModelCode = request.POST['inputModelCode']
@@ -925,11 +1124,20 @@ def add_defect12(request):
     'inputModelCode':inputModelCode,
     'inputModelImage':inputModelImage,
     'defects':data_defect,
+    'datepick_for_check' : datepick_for_check,
     'counter':counter})
 
 def add_defect13(request):
+
+    global status_defect_for_check
+    global counter
+    global datepick_for_check
+
+    status_defect_for_check = 1
     
-    point_defect = 3
+    counter = counter
+    
+    point_defect = 13
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -939,6 +1147,7 @@ def add_defect13(request):
     
     
 
+    datepick_for_check = datepick
     inputModelDesc = request.POST['inputModelDesc']
     inputModelName = request.POST['inputModelName']
     inputModelCode = request.POST['inputModelCode']
@@ -980,11 +1189,20 @@ def add_defect13(request):
     'inputModelCode':inputModelCode,
     'inputModelImage':inputModelImage,
     'defects':data_defect,
+    'datepick_for_check' : datepick_for_check,
     'counter':counter})
 
 def add_defect14(request):
+
+    global status_defect_for_check
+    global counter
+    global datepick_for_check
+
+    status_defect_for_check = 1
     
-    point_defect = 3
+    counter = counter
+    
+    point_defect = 14
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -994,6 +1212,7 @@ def add_defect14(request):
     
     
 
+    datepick_for_check = datepick
     inputModelDesc = request.POST['inputModelDesc']
     inputModelName = request.POST['inputModelName']
     inputModelCode = request.POST['inputModelCode']
@@ -1039,11 +1258,20 @@ def add_defect14(request):
     'inputModelCode':inputModelCode,
     'inputModelImage':inputModelImage,
     'defects':data_defect,
+    'datepick_for_check' : datepick_for_check,
     'counter':counter})
 
 def add_defect15(request):
+
+    global status_defect_for_check
+    global counter
+    global datepick_for_check
+
+    status_defect_for_check = 1
     
-    point_defect = 3
+    counter = counter
+    
+    point_defect = 15
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -1053,6 +1281,7 @@ def add_defect15(request):
     
     
 
+    datepick_for_check = datepick
     inputModelDesc = request.POST['inputModelDesc']
     inputModelName = request.POST['inputModelName']
     inputModelCode = request.POST['inputModelCode']
@@ -1101,6 +1330,7 @@ def add_defect15(request):
     'inputModelCode':inputModelCode,
     'inputModelImage':inputModelImage,
     'defects':data_defect,
+    'datepick_for_check' : datepick_for_check,
     'counter':counter})
 
 
@@ -1109,8 +1339,16 @@ def add_defect15(request):
 
 
 def add_defect16(request):
+
+    global status_defect_for_check
+    global counter
+    global datepick_for_check
+
+    status_defect_for_check = 1
     
-    point_defect = 4
+    counter = counter
+    
+    point_defect = 16
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -1120,6 +1358,7 @@ def add_defect16(request):
     
     
 
+    datepick_for_check = datepick
     inputModelDesc = request.POST['inputModelDesc']
     inputModelName = request.POST['inputModelName']
     inputModelCode = request.POST['inputModelCode']
@@ -1155,11 +1394,20 @@ def add_defect16(request):
     'inputModelCode':inputModelCode,
     'inputModelImage':inputModelImage,
     'defects':data_defect,
+    'datepick_for_check' : datepick_for_check,
     'counter':counter})
 
 def add_defect17(request):
+
+    global status_defect_for_check
+    global counter
+    global datepick_for_check
+
+    status_defect_for_check = 1
     
-    point_defect = 4
+    counter = counter
+    
+    point_defect = 17
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -1169,6 +1417,7 @@ def add_defect17(request):
     
     
 
+    datepick_for_check = datepick
     inputModelDesc = request.POST['inputModelDesc']
     inputModelName = request.POST['inputModelName']
     inputModelCode = request.POST['inputModelCode']
@@ -1208,11 +1457,20 @@ def add_defect17(request):
     'inputModelCode':inputModelCode,
     'inputModelImage':inputModelImage,
     'defects':data_defect,
+    'datepick_for_check' : datepick_for_check,
     'counter':counter})
 
 def add_defect18(request):
+
+    global status_defect_for_check
+    global counter
+    global datepick_for_check
+
+    status_defect_for_check = 1
     
-    point_defect = 4
+    counter = counter
+    
+    point_defect = 18
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -1222,6 +1480,7 @@ def add_defect18(request):
     
     
 
+    datepick_for_check = datepick
     inputModelDesc = request.POST['inputModelDesc']
     inputModelName = request.POST['inputModelName']
     inputModelCode = request.POST['inputModelCode']
@@ -1263,11 +1522,20 @@ def add_defect18(request):
     'inputModelCode':inputModelCode,
     'inputModelImage':inputModelImage,
     'defects':data_defect,
+    'datepick_for_check' : datepick_for_check,
     'counter':counter})
 
 def add_defect19(request):
+
+    global status_defect_for_check
+    global counter
+    global datepick_for_check
+
+    status_defect_for_check = 1
     
-    point_defect = 4
+    counter = counter
+    
+    point_defect = 19
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -1277,6 +1545,7 @@ def add_defect19(request):
     
     
 
+    datepick_for_check = datepick
     inputModelDesc = request.POST['inputModelDesc']
     inputModelName = request.POST['inputModelName']
     inputModelCode = request.POST['inputModelCode']
@@ -1322,11 +1591,20 @@ def add_defect19(request):
     'inputModelCode':inputModelCode,
     'inputModelImage':inputModelImage,
     'defects':data_defect,
+    'datepick_for_check' : datepick_for_check,
     'counter':counter})
 
 def add_defect20(request):
+
+    global status_defect_for_check
+    global counter
+    global datepick_for_check
+
+    status_defect_for_check = 1
     
-    point_defect = 4
+    counter = counter
+    
+    point_defect = 20
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -1336,6 +1614,7 @@ def add_defect20(request):
     
     
 
+    datepick_for_check = datepick
     inputModelDesc = request.POST['inputModelDesc']
     inputModelName = request.POST['inputModelName']
     inputModelCode = request.POST['inputModelCode']
@@ -1384,14 +1663,23 @@ def add_defect20(request):
     'inputModelCode':inputModelCode,
     'inputModelImage':inputModelImage,
     'defects':data_defect,
+    'datepick_for_check' : datepick_for_check,
     'counter':counter})
 
 
 
 
 def add_defect21(request):
+
+    global status_defect_for_check
+    global counter
+    global datepick_for_check
+
+    status_defect_for_check = 1
     
-    point_defect = 5
+    counter = counter
+    
+    point_defect = 21
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -1401,6 +1689,7 @@ def add_defect21(request):
     
     
 
+    datepick_for_check = datepick
     inputModelDesc = request.POST['inputModelDesc']
     inputModelName = request.POST['inputModelName']
     inputModelCode = request.POST['inputModelCode']
@@ -1436,11 +1725,20 @@ def add_defect21(request):
     'inputModelCode':inputModelCode,
     'inputModelImage':inputModelImage,
     'defects':data_defect,
+    'datepick_for_check' : datepick_for_check,
     'counter':counter})
 
 def add_defect22(request):
+
+    global status_defect_for_check
+    global counter
+    global datepick_for_check
+
+    status_defect_for_check = 1
     
-    point_defect = 5
+    counter = counter
+    
+    point_defect = 22
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -1450,6 +1748,7 @@ def add_defect22(request):
     
     
 
+    datepick_for_check = datepick
     inputModelDesc = request.POST['inputModelDesc']
     inputModelName = request.POST['inputModelName']
     inputModelCode = request.POST['inputModelCode']
@@ -1489,11 +1788,20 @@ def add_defect22(request):
     'inputModelCode':inputModelCode,
     'inputModelImage':inputModelImage,
     'defects':data_defect,
+    'datepick_for_check' : datepick_for_check,
     'counter':counter})
 
 def add_defect23(request):
+
+    global status_defect_for_check
+    global counter
+    global datepick_for_check
+
+    status_defect_for_check = 1
     
-    point_defect = 5
+    counter = counter
+    
+    point_defect = 23
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -1503,6 +1811,7 @@ def add_defect23(request):
     
     
 
+    datepick_for_check = datepick
     inputModelDesc = request.POST['inputModelDesc']
     inputModelName = request.POST['inputModelName']
     inputModelCode = request.POST['inputModelCode']
@@ -1544,11 +1853,20 @@ def add_defect23(request):
     'inputModelCode':inputModelCode,
     'inputModelImage':inputModelImage,
     'defects':data_defect,
+    'datepick_for_check' : datepick_for_check,
     'counter':counter})
 
 def add_defect24(request):
+
+    global status_defect_for_check
+    global counter
+    global datepick_for_check
+
+    status_defect_for_check = 1
     
-    point_defect = 5
+    counter = counter
+    
+    point_defect = 24
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -1558,6 +1876,7 @@ def add_defect24(request):
     
     
 
+    datepick_for_check = datepick
     inputModelDesc = request.POST['inputModelDesc']
     inputModelName = request.POST['inputModelName']
     inputModelCode = request.POST['inputModelCode']
@@ -1603,11 +1922,20 @@ def add_defect24(request):
     'inputModelCode':inputModelCode,
     'inputModelImage':inputModelImage,
     'defects':data_defect,
+    'datepick_for_check' : datepick_for_check,
     'counter':counter})
 
 def add_defect25(request):
+
+    global status_defect_for_check
+    global counter
+    global datepick_for_check
+
+    status_defect_for_check = 1
     
-    point_defect = 5
+    counter = counter
+    
+    point_defect = 25
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -1617,6 +1945,7 @@ def add_defect25(request):
     
     
 
+    datepick_for_check = datepick
     inputModelDesc = request.POST['inputModelDesc']
     inputModelName = request.POST['inputModelName']
     inputModelCode = request.POST['inputModelCode']
@@ -1665,6 +1994,7 @@ def add_defect25(request):
     'inputModelCode':inputModelCode,
     'inputModelImage':inputModelImage,
     'defects':data_defect,
+    'datepick_for_check' : datepick_for_check,
     'counter':counter})
 
 
@@ -1672,9 +2002,17 @@ def add_defect25(request):
 
 
 def add_defect26(request):
+
+    global status_defect_for_check
+    global counter
+    global datepick_for_check
+
+    status_defect_for_check = 1
+    
+    counter = counter
     
    
-    point_defect = 6
+    point_defect = 26
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -1684,6 +2022,7 @@ def add_defect26(request):
     
     
 
+    datepick_for_check = datepick
     inputModelDesc = request.POST['inputModelDesc']
     inputModelName = request.POST['inputModelName']
     inputModelCode = request.POST['inputModelCode']
@@ -1719,11 +2058,20 @@ def add_defect26(request):
     'inputModelCode':inputModelCode,
     'inputModelImage':inputModelImage,
     'defects':data_defect,
+    'datepick_for_check' : datepick_for_check,
     'counter':counter})
 
 def add_defect27(request):
+
+    global status_defect_for_check
+    global counter
+    global datepick_for_check
+
+    status_defect_for_check = 1
     
-    point_defect = 6
+    counter = counter
+    
+    point_defect = 27
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -1733,6 +2081,7 @@ def add_defect27(request):
     
     
 
+    datepick_for_check = datepick
     inputModelDesc = request.POST['inputModelDesc']
     inputModelName = request.POST['inputModelName']
     inputModelCode = request.POST['inputModelCode']
@@ -1772,11 +2121,20 @@ def add_defect27(request):
     'inputModelCode':inputModelCode,
     'inputModelImage':inputModelImage,
     'defects':data_defect,
+    'datepick_for_check' : datepick_for_check,
     'counter':counter})
 
 def add_defect28(request):
+
+    global status_defect_for_check
+    global counter
+    global datepick_for_check
+
+    status_defect_for_check = 1
     
-    point_defect = 6
+    counter = counter
+    
+    point_defect = 28
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -1786,6 +2144,7 @@ def add_defect28(request):
     
     
 
+    datepick_for_check = datepick
     inputModelDesc = request.POST['inputModelDesc']
     inputModelName = request.POST['inputModelName']
     inputModelCode = request.POST['inputModelCode']
@@ -1827,11 +2186,20 @@ def add_defect28(request):
     'inputModelCode':inputModelCode,
     'inputModelImage':inputModelImage,
     'defects':data_defect,
+    'datepick_for_check' : datepick_for_check,
     'counter':counter})
 
 def add_defect29(request):
+
+    global status_defect_for_check
+    global counter
+    global datepick_for_check
+
+    status_defect_for_check = 1
     
-    point_defect = 6
+    counter = counter
+    
+    point_defect = 29
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -1841,6 +2209,7 @@ def add_defect29(request):
     
     
 
+    datepick_for_check = datepick
     inputModelDesc = request.POST['inputModelDesc']
     inputModelName = request.POST['inputModelName']
     inputModelCode = request.POST['inputModelCode']
@@ -1886,12 +2255,21 @@ def add_defect29(request):
     'inputModelCode':inputModelCode,
     'inputModelImage':inputModelImage,
     'defects':data_defect,
+    'datepick_for_check' : datepick_for_check,
     'counter':counter})
 
 def add_defect30(request):
+
+    global status_defect_for_check
+    global counter
+    global datepick_for_check
+
+    status_defect_for_check = 1
+    
+    counter = counter
     
  
-    point_defect = 6
+    point_defect = 30
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -1901,6 +2279,7 @@ def add_defect30(request):
     
     
 
+    datepick_for_check = datepick
     inputModelDesc = request.POST['inputModelDesc']
     inputModelName = request.POST['inputModelName']
     inputModelCode = request.POST['inputModelCode']
@@ -1949,6 +2328,7 @@ def add_defect30(request):
     'inputModelCode':inputModelCode,
     'inputModelImage':inputModelImage,
     'defects':data_defect,
+    'datepick_for_check' : datepick_for_check,
     'counter':counter})
 
 
@@ -1956,8 +2336,16 @@ def add_defect30(request):
 
 
 def add_defect31(request):
+
+    global status_defect_for_check
+    global counter
+    global datepick_for_check
+
+    status_defect_for_check = 1
     
-    point_defect = 7
+    counter = counter
+    
+    point_defect = 31
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -1967,6 +2355,7 @@ def add_defect31(request):
     
     
 
+    datepick_for_check = datepick
     inputModelDesc = request.POST['inputModelDesc']
     inputModelName = request.POST['inputModelName']
     inputModelCode = request.POST['inputModelCode']
@@ -2002,11 +2391,20 @@ def add_defect31(request):
     'inputModelCode':inputModelCode,
     'inputModelImage':inputModelImage,
     'defects':data_defect,
+    'datepick_for_check' : datepick_for_check,
     'counter':counter})
 
 def add_defect32(request):
+
+    global status_defect_for_check
+    global counter
+    global datepick_for_check
+
+    status_defect_for_check = 1
     
-    point_defect = 7
+    counter = counter
+    
+    point_defect = 32
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -2016,6 +2414,7 @@ def add_defect32(request):
     
     
 
+    datepick_for_check = datepick
     inputModelDesc = request.POST['inputModelDesc']
     inputModelName = request.POST['inputModelName']
     inputModelCode = request.POST['inputModelCode']
@@ -2055,11 +2454,20 @@ def add_defect32(request):
     'inputModelCode':inputModelCode,
     'inputModelImage':inputModelImage,
     'defects':data_defect,
+    'datepick_for_check' : datepick_for_check,
     'counter':counter})
 
 def add_defect33(request):
+
+    global status_defect_for_check
+    global counter
+    global datepick_for_check
+
+    status_defect_for_check = 1
     
-    point_defect = 7
+    counter = counter
+    
+    point_defect = 33
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -2069,6 +2477,7 @@ def add_defect33(request):
     
     
 
+    datepick_for_check = datepick
     inputModelDesc = request.POST['inputModelDesc']
     inputModelName = request.POST['inputModelName']
     inputModelCode = request.POST['inputModelCode']
@@ -2110,11 +2519,20 @@ def add_defect33(request):
     'inputModelCode':inputModelCode,
     'inputModelImage':inputModelImage,
     'defects':data_defect,
+    'datepick_for_check' : datepick_for_check,
     'counter':counter})
 
 def add_defect34(request):
+
+    global status_defect_for_check
+    global counter
+    global datepick_for_check
+
+    status_defect_for_check = 1
     
-    point_defect = 7
+    counter = counter
+    
+    point_defect = 34
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -2124,6 +2542,7 @@ def add_defect34(request):
     
     
 
+    datepick_for_check = datepick
     inputModelDesc = request.POST['inputModelDesc']
     inputModelName = request.POST['inputModelName']
     inputModelCode = request.POST['inputModelCode']
@@ -2169,11 +2588,20 @@ def add_defect34(request):
     'inputModelCode':inputModelCode,
     'inputModelImage':inputModelImage,
     'defects':data_defect,
+    'datepick_for_check' : datepick_for_check,
     'counter':counter})
 
 def add_defect35(request):
+
+    global status_defect_for_check
+    global counter
+    global datepick_for_check
+
+    status_defect_for_check = 1
     
-    point_defect = 7
+    counter = counter
+    
+    point_defect = 35
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -2183,6 +2611,7 @@ def add_defect35(request):
     
     
 
+    datepick_for_check = datepick
     inputModelDesc = request.POST['inputModelDesc']
     inputModelName = request.POST['inputModelName']
     inputModelCode = request.POST['inputModelCode']
@@ -2231,14 +2660,23 @@ def add_defect35(request):
     'inputModelCode':inputModelCode,
     'inputModelImage':inputModelImage,
     'defects':data_defect,
+    'datepick_for_check' : datepick_for_check,
     'counter':counter})
 
 
 
 
 def add_defect36(request):
+
+    global status_defect_for_check
+    global counter
+    global datepick_for_check
+
+    status_defect_for_check = 1
     
-    point_defect = 8
+    counter = counter
+    
+    point_defect = 36
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -2248,6 +2686,7 @@ def add_defect36(request):
     
     
 
+    datepick_for_check = datepick
     inputModelDesc = request.POST['inputModelDesc']
     inputModelName = request.POST['inputModelName']
     inputModelCode = request.POST['inputModelCode']
@@ -2283,11 +2722,20 @@ def add_defect36(request):
     'inputModelCode':inputModelCode,
     'inputModelImage':inputModelImage,
     'defects':data_defect,
+    'datepick_for_check' : datepick_for_check,
     'counter':counter})
 
 def add_defect37(request):
+
+    global status_defect_for_check
+    global counter
+    global datepick_for_check
+
+    status_defect_for_check = 1
     
-    point_defect = 8
+    counter = counter
+    
+    point_defect = 37
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -2297,6 +2745,7 @@ def add_defect37(request):
     
     
 
+    datepick_for_check = datepick
     inputModelDesc = request.POST['inputModelDesc']
     inputModelName = request.POST['inputModelName']
     inputModelCode = request.POST['inputModelCode']
@@ -2336,11 +2785,20 @@ def add_defect37(request):
     'inputModelCode':inputModelCode,
     'inputModelImage':inputModelImage,
     'defects':data_defect,
+    'datepick_for_check' : datepick_for_check,
     'counter':counter})
 
 def add_defect38(request):
+
+    global status_defect_for_check
+    global counter
+    global datepick_for_check
+
+    status_defect_for_check = 1
     
-    point_defect = 8
+    counter = counter
+    
+    point_defect = 38
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -2350,6 +2808,7 @@ def add_defect38(request):
     
     
 
+    datepick_for_check = datepick
     inputModelDesc = request.POST['inputModelDesc']
     inputModelName = request.POST['inputModelName']
     inputModelCode = request.POST['inputModelCode']
@@ -2391,11 +2850,20 @@ def add_defect38(request):
     'inputModelCode':inputModelCode,
     'inputModelImage':inputModelImage,
     'defects':data_defect,
+    'datepick_for_check' : datepick_for_check,
     'counter':counter})
 
 def add_defect39(request):
+
+    global status_defect_for_check
+    global counter
+    global datepick_for_check
+
+    status_defect_for_check = 1
     
-    point_defect = 8
+    counter = counter
+    
+    point_defect = 39
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -2405,6 +2873,7 @@ def add_defect39(request):
     
     
 
+    datepick_for_check = datepick
     inputModelDesc = request.POST['inputModelDesc']
     inputModelName = request.POST['inputModelName']
     inputModelCode = request.POST['inputModelCode']
@@ -2450,11 +2919,20 @@ def add_defect39(request):
     'inputModelCode':inputModelCode,
     'inputModelImage':inputModelImage,
     'defects':data_defect,
+    'datepick_for_check' : datepick_for_check,
     'counter':counter})
 
 def add_defect40(request):
+
+    global status_defect_for_check
+    global counter
+    global datepick_for_check
+
+    status_defect_for_check = 1
     
-    point_defect = 8
+    counter = counter
+    
+    point_defect = 40
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -2464,6 +2942,7 @@ def add_defect40(request):
     
     
 
+    datepick_for_check = datepick
     inputModelDesc = request.POST['inputModelDesc']
     inputModelName = request.POST['inputModelName']
     inputModelCode = request.POST['inputModelCode']
@@ -2512,14 +2991,23 @@ def add_defect40(request):
     'inputModelCode':inputModelCode,
     'inputModelImage':inputModelImage,
     'defects':data_defect,
+    'datepick_for_check' : datepick_for_check,
     'counter':counter})
 
 
 
 
 def add_defect41(request):
+
+    global status_defect_for_check
+    global counter
+    global datepick_for_check
+
+    status_defect_for_check = 1
     
-    point_defect = 9
+    counter = counter
+    
+    point_defect = 41
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -2529,6 +3017,7 @@ def add_defect41(request):
     
     
 
+    datepick_for_check = datepick
     inputModelDesc = request.POST['inputModelDesc']
     inputModelName = request.POST['inputModelName']
     inputModelCode = request.POST['inputModelCode']
@@ -2564,11 +3053,20 @@ def add_defect41(request):
     'inputModelCode':inputModelCode,
     'inputModelImage':inputModelImage,
     'defects':data_defect,
+    'datepick_for_check' : datepick_for_check,
     'counter':counter})
 
 def add_defect42(request):
+
+    global status_defect_for_check
+    global counter
+    global datepick_for_check
+
+    status_defect_for_check = 1
     
-    point_defect = 9
+    counter = counter
+    
+    point_defect = 42
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -2578,6 +3076,7 @@ def add_defect42(request):
     
     
 
+    datepick_for_check = datepick
     inputModelDesc = request.POST['inputModelDesc']
     inputModelName = request.POST['inputModelName']
     inputModelCode = request.POST['inputModelCode']
@@ -2617,11 +3116,20 @@ def add_defect42(request):
     'inputModelCode':inputModelCode,
     'inputModelImage':inputModelImage,
     'defects':data_defect,
+    'datepick_for_check' : datepick_for_check,
     'counter':counter})
 
 def add_defect43(request):
+
+    global status_defect_for_check
+    global counter
+    global datepick_for_check
+
+    status_defect_for_check = 1
     
-    point_defect = 9
+    counter = counter
+    
+    point_defect = 43
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -2631,6 +3139,7 @@ def add_defect43(request):
     
     
 
+    datepick_for_check = datepick
     inputModelDesc = request.POST['inputModelDesc']
     inputModelName = request.POST['inputModelName']
     inputModelCode = request.POST['inputModelCode']
@@ -2672,11 +3181,20 @@ def add_defect43(request):
     'inputModelCode':inputModelCode,
     'inputModelImage':inputModelImage,
     'defects':data_defect,
+    'datepick_for_check' : datepick_for_check,
     'counter':counter})
 
 def add_defect44(request):
+
+    global status_defect_for_check
+    global counter
+    global datepick_for_check
+
+    status_defect_for_check = 1
     
-    point_defect = 9
+    counter = counter
+    
+    point_defect = 44
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -2686,6 +3204,7 @@ def add_defect44(request):
     
     
 
+    datepick_for_check = datepick
     inputModelDesc = request.POST['inputModelDesc']
     inputModelName = request.POST['inputModelName']
     inputModelCode = request.POST['inputModelCode']
@@ -2731,11 +3250,20 @@ def add_defect44(request):
     'inputModelCode':inputModelCode,
     'inputModelImage':inputModelImage,
     'defects':data_defect,
+    'datepick_for_check' : datepick_for_check,
     'counter':counter})
 
 def add_defect45(request):
+
+    global status_defect_for_check
+    global counter
+    global datepick_for_check
+
+    status_defect_for_check = 1
     
-    point_defect = 9
+    counter = counter
+    
+    point_defect = 45
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -2745,6 +3273,7 @@ def add_defect45(request):
     
     
 
+    datepick_for_check = datepick
     inputModelDesc = request.POST['inputModelDesc']
     inputModelName = request.POST['inputModelName']
     inputModelCode = request.POST['inputModelCode']
@@ -2793,14 +3322,23 @@ def add_defect45(request):
     'inputModelCode':inputModelCode,
     'inputModelImage':inputModelImage,
     'defects':data_defect,
+    'datepick_for_check' : datepick_for_check,
     'counter':counter})
 
 
 
 
 def add_defect46(request):
+
+    global status_defect_for_check
+    global counter
+    global datepick_for_check
+
+    status_defect_for_check = 1
     
-    point_defect = 10
+    counter = counter
+    
+    point_defect = 46
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -2810,6 +3348,7 @@ def add_defect46(request):
     
     
 
+    datepick_for_check = datepick
     inputModelDesc = request.POST['inputModelDesc']
     inputModelName = request.POST['inputModelName']
     inputModelCode = request.POST['inputModelCode']
@@ -2845,11 +3384,20 @@ def add_defect46(request):
     'inputModelCode':inputModelCode,
     'inputModelImage':inputModelImage,
     'defects':data_defect,
+    'datepick_for_check' : datepick_for_check,
     'counter':counter})
 
 def add_defect47(request):
+
+    global status_defect_for_check
+    global counter
+    global datepick_for_check
+
+    status_defect_for_check = 1
     
-    point_defect = 10
+    counter = counter
+    
+    point_defect = 47
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -2859,6 +3407,7 @@ def add_defect47(request):
     
     
 
+    datepick_for_check = datepick
     inputModelDesc = request.POST['inputModelDesc']
     inputModelName = request.POST['inputModelName']
     inputModelCode = request.POST['inputModelCode']
@@ -2898,11 +3447,20 @@ def add_defect47(request):
     'inputModelCode':inputModelCode,
     'inputModelImage':inputModelImage,
     'defects':data_defect,
+    'datepick_for_check' : datepick_for_check,
     'counter':counter})
 
 def add_defect48(request):
+
+    global status_defect_for_check
+    global counter
+    global datepick_for_check
+
+    status_defect_for_check = 1
     
-    point_defect = 10
+    counter = counter
+    
+    point_defect = 48
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -2912,6 +3470,7 @@ def add_defect48(request):
     
     
 
+    datepick_for_check = datepick
     inputModelDesc = request.POST['inputModelDesc']
     inputModelName = request.POST['inputModelName']
     inputModelCode = request.POST['inputModelCode']
@@ -2953,11 +3512,20 @@ def add_defect48(request):
     'inputModelCode':inputModelCode,
     'inputModelImage':inputModelImage,
     'defects':data_defect,
+    'datepick_for_check' : datepick_for_check,
     'counter':counter})
 
 def add_defect49(request):
+
+    global status_defect_for_check
+    global counter
+    global datepick_for_check
+
+    status_defect_for_check = 1
     
-    point_defect = 10
+    counter = counter
+    
+    point_defect = 49
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -2967,6 +3535,7 @@ def add_defect49(request):
     
     
 
+    datepick_for_check = datepick
     inputModelDesc = request.POST['inputModelDesc']
     inputModelName = request.POST['inputModelName']
     inputModelCode = request.POST['inputModelCode']
@@ -3012,11 +3581,20 @@ def add_defect49(request):
     'inputModelCode':inputModelCode,
     'inputModelImage':inputModelImage,
     'defects':data_defect,
+    'datepick_for_check' : datepick_for_check,
     'counter':counter})
 
 def add_defect50(request):
+
+    global status_defect_for_check
+    global counter
+    global datepick_for_check
+
+    status_defect_for_check = 1
     
-    point_defect = 10
+    counter = counter
+    
+    point_defect = 50
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -3026,6 +3604,7 @@ def add_defect50(request):
     
     
 
+    datepick_for_check = datepick
     inputModelDesc = request.POST['inputModelDesc']
     inputModelName = request.POST['inputModelName']
     inputModelCode = request.POST['inputModelCode']
@@ -3074,14 +3653,23 @@ def add_defect50(request):
     'inputModelCode':inputModelCode,
     'inputModelImage':inputModelImage,
     'defects':data_defect,
+    'datepick_for_check' : datepick_for_check,
     'counter':counter})
 
 
 
 
 def add_defect51(request):
+
+    global status_defect_for_check
+    global counter
+    global datepick_for_check
+
+    status_defect_for_check = 1
     
-    point_defect = 11
+    counter = counter
+    
+    point_defect = 51
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -3091,6 +3679,7 @@ def add_defect51(request):
     
     
 
+    datepick_for_check = datepick
     inputModelDesc = request.POST['inputModelDesc']
     inputModelName = request.POST['inputModelName']
     inputModelCode = request.POST['inputModelCode']
@@ -3126,11 +3715,20 @@ def add_defect51(request):
     'inputModelCode':inputModelCode,
     'inputModelImage':inputModelImage,
     'defects':data_defect,
+    'datepick_for_check' : datepick_for_check,
     'counter':counter})
 
 def add_defect52(request):
+
+    global status_defect_for_check
+    global counter
+    global datepick_for_check
+
+    status_defect_for_check = 1
     
-    point_defect = 11
+    counter = counter
+    
+    point_defect = 52
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -3140,6 +3738,7 @@ def add_defect52(request):
     
     
 
+    datepick_for_check = datepick
     inputModelDesc = request.POST['inputModelDesc']
     inputModelName = request.POST['inputModelName']
     inputModelCode = request.POST['inputModelCode']
@@ -3179,11 +3778,20 @@ def add_defect52(request):
     'inputModelCode':inputModelCode,
     'inputModelImage':inputModelImage,
     'defects':data_defect,
+    'datepick_for_check' : datepick_for_check,
     'counter':counter})
 
 def add_defect53(request):
+
+    global status_defect_for_check
+    global counter
+    global datepick_for_check
+
+    status_defect_for_check = 1
     
-    point_defect = 11
+    counter = counter
+    
+    point_defect = 53
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -3193,6 +3801,7 @@ def add_defect53(request):
     
     
 
+    datepick_for_check = datepick
     inputModelDesc = request.POST['inputModelDesc']
     inputModelName = request.POST['inputModelName']
     inputModelCode = request.POST['inputModelCode']
@@ -3234,11 +3843,20 @@ def add_defect53(request):
     'inputModelCode':inputModelCode,
     'inputModelImage':inputModelImage,
     'defects':data_defect,
+    'datepick_for_check' : datepick_for_check,
     'counter':counter})
 
 def add_defect54(request):
+
+    global status_defect_for_check
+    global counter
+    global datepick_for_check
+
+    status_defect_for_check = 1
     
-    point_defect = 11
+    counter = counter
+    
+    point_defect = 54
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -3248,6 +3866,7 @@ def add_defect54(request):
     
     
 
+    datepick_for_check = datepick
     inputModelDesc = request.POST['inputModelDesc']
     inputModelName = request.POST['inputModelName']
     inputModelCode = request.POST['inputModelCode']
@@ -3293,11 +3912,20 @@ def add_defect54(request):
     'inputModelCode':inputModelCode,
     'inputModelImage':inputModelImage,
     'defects':data_defect,
+    'datepick_for_check' : datepick_for_check,
     'counter':counter})
 
 def add_defect55(request):
+
+    global status_defect_for_check
+    global counter
+    global datepick_for_check
+
+    status_defect_for_check = 1
     
-    point_defect = 11
+    counter = counter
+    
+    point_defect = 55
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -3307,6 +3935,7 @@ def add_defect55(request):
     
     
 
+    datepick_for_check = datepick
     inputModelDesc = request.POST['inputModelDesc']
     inputModelName = request.POST['inputModelName']
     inputModelCode = request.POST['inputModelCode']
@@ -3355,6 +3984,7 @@ def add_defect55(request):
     'inputModelCode':inputModelCode,
     'inputModelImage':inputModelImage,
     'defects':data_defect,
+    'datepick_for_check' : datepick_for_check,
     'counter':counter})
 
 
@@ -3362,9 +3992,17 @@ def add_defect55(request):
 
 
 def add_defect56(request):
+
+    global status_defect_for_check
+    global counter
+    global datepick_for_check
+
+    status_defect_for_check = 1
+    
+    counter = counter
     
    
-    point_defect = 12
+    point_defect = 56
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -3374,6 +4012,7 @@ def add_defect56(request):
     
     
 
+    datepick_for_check = datepick
     inputModelDesc = request.POST['inputModelDesc']
     inputModelName = request.POST['inputModelName']
     inputModelCode = request.POST['inputModelCode']
@@ -3409,11 +4048,20 @@ def add_defect56(request):
     'inputModelCode':inputModelCode,
     'inputModelImage':inputModelImage,
     'defects':data_defect,
+    'datepick_for_check' : datepick_for_check,
     'counter':counter})
 
 def add_defect57(request):
+
+    global status_defect_for_check
+    global counter
+    global datepick_for_check
+
+    status_defect_for_check = 1
     
-    point_defect = 12
+    counter = counter
+    
+    point_defect = 57
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -3423,6 +4071,7 @@ def add_defect57(request):
     
     
 
+    datepick_for_check = datepick
     inputModelDesc = request.POST['inputModelDesc']
     inputModelName = request.POST['inputModelName']
     inputModelCode = request.POST['inputModelCode']
@@ -3462,11 +4111,20 @@ def add_defect57(request):
     'inputModelCode':inputModelCode,
     'inputModelImage':inputModelImage,
     'defects':data_defect,
+    'datepick_for_check' : datepick_for_check,
     'counter':counter})
 
 def add_defect58(request):
+
+    global status_defect_for_check
+    global counter
+    global datepick_for_check
+
+    status_defect_for_check = 1
     
-    point_defect = 12
+    counter = counter
+    
+    point_defect = 58
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -3476,6 +4134,7 @@ def add_defect58(request):
     
     
 
+    datepick_for_check = datepick
     inputModelDesc = request.POST['inputModelDesc']
     inputModelName = request.POST['inputModelName']
     inputModelCode = request.POST['inputModelCode']
@@ -3517,11 +4176,20 @@ def add_defect58(request):
     'inputModelCode':inputModelCode,
     'inputModelImage':inputModelImage,
     'defects':data_defect,
+    'datepick_for_check' : datepick_for_check,
     'counter':counter})
 
 def add_defect59(request):
+
+    global status_defect_for_check
+    global counter
+    global datepick_for_check
+
+    status_defect_for_check = 1
     
-    point_defect = 12
+    counter = counter
+    
+    point_defect = 59
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -3531,6 +4199,7 @@ def add_defect59(request):
     
     
 
+    datepick_for_check = datepick
     inputModelDesc = request.POST['inputModelDesc']
     inputModelName = request.POST['inputModelName']
     inputModelCode = request.POST['inputModelCode']
@@ -3576,11 +4245,20 @@ def add_defect59(request):
     'inputModelCode':inputModelCode,
     'inputModelImage':inputModelImage,
     'defects':data_defect,
+    'datepick_for_check' : datepick_for_check,
     'counter':counter})
 
 def add_defect60(request):
+
+    global status_defect_for_check
+    global counter
+    global datepick_for_check
+
+    status_defect_for_check = 1
     
-    point_defect = 12
+    counter = counter
+    
+    point_defect = 60
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -3590,6 +4268,7 @@ def add_defect60(request):
     
     
 
+    datepick_for_check = datepick
     inputModelDesc = request.POST['inputModelDesc']
     inputModelName = request.POST['inputModelName']
     inputModelCode = request.POST['inputModelCode']
@@ -3638,6 +4317,7 @@ def add_defect60(request):
     'inputModelCode':inputModelCode,
     'inputModelImage':inputModelImage,
     'defects':data_defect,
+    'datepick_for_check' : datepick_for_check,
     'counter':counter})
 
     

@@ -1,7 +1,8 @@
 {% extends 'layout.html' %} {% block content %}
 {% if messages %} {% for message in messages %}
 
-<div class="alert alert-{{ message.tags }} collapse alert-dismissible fade show" role="alert">
+<div class="animate__animated animate__fadeInLeft alert alert-{{ message.tags }} collapse alert-dismissible fade show "
+  role="alert">
   <b>{{message}}</b>
   <button type="button" class="close" data-dismiss="alert" aria-label="Close">
     <span aria-hidden="true">&times;</span>
@@ -10,32 +11,7 @@
 
 {% endfor%} {% endif %}
 
-<style>
-  .alert {
-    position: relative;
-    opacity: 1;
-    visibility: visible;
-    transform: translateX(0px);
-    transition: visibility 0s, opacity 250ms, transform 250ms;
-  }
 
-  .alert.hide {
-    position: relative;
-    opacity: 0;
-    visibility: hidden;
-    transform: translateX(-10px); // translateX, translateY, translateZ works well
-    transition: visibility 0s 250ms, opacity 250ms, transform 250ms;
-  }
-</style>
-<script>
-  var m = document.getElementsByClassName("alert");  // Return an array
-
-  setTimeout(function () {
-    if (m && m.length) {
-      m[0].classList.add('hide');
-    }
-  }, 3000);
-</script>
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -79,6 +55,8 @@
                     <th scope="col ">Model description</th>
                     <th scope="col ">Date</th>
                     <th scope="col ">Shift</th>
+                    <th scope="col ">Datepick</th>
+                    <th scope="col ">Datepickforcheck</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -90,6 +68,11 @@
                     <td>{{inputModelDesc}}</td>
                     <td>{{datepick}}</td>
                     <td>{{shift}}</td>
+                    <td>{{datepick}}</td>
+                    <td>{{datepick_for_check}}</td>
+
+
+
 
                   </tr>
 
@@ -121,18 +104,18 @@
 
 
   <div class="row" style="margin-top: 1rem; ">
-    <div class="col col-md-6 ">
+    <div class="col col-sd-6 ">
       <h5>Please , Choose point of defect on Glass.</h5>
     </div>
-    <div class="col col-md-2 "></div>
+    <div class="col col-sd-2 "></div>
 
-    <div class="col col-md-2 ">
+    <div class="col col-sd-2 ">
       <a onclick="myFunction()" class="btn btn-info  btn-block" data-toggle="collapse" data-target="#collapseOne"
         aria-expanded="true" aria-controls="collapseOne" style="color: aliceblue;">
         <i class="fas fa-chevron-circle-down"></i> Add defect
       </a>
     </div>
-    <div class="col col-md-2">
+    <div class="col col-sd-2">
       <form action="/add_no_defect" method="post" enctype="multipart/form-data">
         {% csrf_token %}
         <button id="No_defect_btn" type="submit" class="btn btn-success  btn-block" style="color: aliceblue;">
@@ -147,6 +130,8 @@
         <input type="hidden" id="datepick" name="datepick" value="{{datepick}}">
         <input type="hidden" id="shift" name="shift" value="{{shift}}">
         <input type="hidden" id="status_glass" name="status_glass" value="OK">
+        <input type="hidden" id="counter" name="counter" value="{{counter}}">
+
       </form>
 
     </div>
@@ -158,14 +143,25 @@
       <div class="card card-header">
         <form action="/add_have_defect" method="post" enctype="multipart/form-data">
           {% csrf_token %}
-          <button class="btn btn-success btn-lg" type="submit"><i class=" fas fa-save"> Save and next
-              Glass</i></button>
+          <button class="btn btn-success btn-block btn-lg" type="submit"><i class=" fas fa-save"></i> Save and
+            go to
+            next
+            Glass</button>
+
+          <input type="hidden" id="inputModelDesc" name="inputModelDesc" value="{{inputModelDesc}}">
+          <input type="hidden" id="inputModelName" name="inputModelName" value="{{inputModelName}}">
+          <input type="hidden" id="inputModelCode" name="inputModelCode" value="{{inputModelCode}}">
+          <input type="hidden" id="department" name="department" value="{{user.userprofile.department}}">
+          <input type="hidden" id="inputModelImage" name="inputModelImage" value="{{inputModelImage}}">
+          <input type="hidden" id="datepick" name="datepick" value="{{datepick}}">
+          <input type="hidden" id="shift" name="shift" value="{{shift}}">
+          <input type="hidden" id="status_glass" name="status_glass" value="NG">
         </form>
 
       </div>
       <div class="card card-body">
         <div class=" row"
-          style="margin-top: 1rem; background-image: url( '..{{inputModelImage}}'); background-position: center; background-repeat: no-repeat; background-size: cover; height: 600px; width: 800px;  ">
+          style="padding-left:1rem; padding-top:2rem; margin-top: 1rem; background-image: url( '..{{inputModelImage}}'); background-position: center; background-repeat: no-repeat; background-size: cover; height: 600px; width: 800px;  ">
           <div class="col">
 
             <div class="row" style="padding: 1rem; ">
