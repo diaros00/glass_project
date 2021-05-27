@@ -104,18 +104,18 @@
 
 
   <div class="row" style="margin-top: 1rem; ">
-    <div class="col col-sd-6 ">
+    <div class="col col-sd-5 ">
       <h5>Please , Choose point of defect on Glass.</h5>
     </div>
-    <div class="col col-sd-2 "></div>
 
-    <div class="col col-sd-2 ">
+
+    <div class="col col-sd-1 ">
       <a onclick="myFunction()" class="btn btn-info  btn-block" data-toggle="collapse" data-target="#collapseOne"
         aria-expanded="true" aria-controls="collapseOne" style="color: aliceblue;">
         <i class="fas fa-chevron-circle-down"></i> Add defect
       </a>
     </div>
-    <div class="col col-sd-2">
+    <div class="col col-sd-1">
       <form action="/add_no_defect" method="post" enctype="multipart/form-data">
         {% csrf_token %}
         <button id="No_defect_btn" type="submit" class="btn btn-success  btn-block" style="color: aliceblue;">
@@ -134,7 +134,12 @@
 
       </form>
 
+
+
     </div>
+    <div class="col col-sd-1 "><a href="/home" class="btn btn-danger  btn-block" style="color: aliceblue;">
+        <i class="fas fa-sign-out-alt"></i> Exit
+      </a></div>
 
   </div>
 

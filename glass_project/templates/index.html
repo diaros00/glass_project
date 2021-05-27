@@ -1,8 +1,8 @@
- {% extends 'layout.html' %} {% block content %} {% if messages %} {% for message in messages %}
+{% extends 'layout.html' %} {% block content %} {% if messages %} {% for message in messages %}
 
 <div class="alert alert-{{ message.tags }} collapse alert-dismissible fade show" role="alert">
-    <b>{{message}}</b>
-    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+  <b>{{message}}</b>
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
     <span aria-hidden="true">&times;</span>
   </button>
 </div>
@@ -10,149 +10,136 @@
 {% endfor%} {% endif %}
 
 
-<div style=" margin: 2rem">
-    <a class="btn btn-outline-info btn-block btn-lg" href="/collector">Start Program Collection  <i class="fas fa-share-square"></i></a>
+<div class="row" style=" margin: 1rem">
+
+  <div class="col-md-7"> <a class="btn btn-outline-info btn-block btn-lg" href="/collector">Start Program Collection <i
+        class="fas fa-share-square"></i></a></div>
+  <div class="col-md-5"> <a class="btn btn-outline-success btn-block btn-lg" href="/report">Report <i
+        class="fas fa-chart-bar"></i></a></div>
+
 </div>
 
 <div class="card text-dark bg-light" style="max-width: 80rem; margin: 2rem">
-    <div class="card-header text-info">
-        <div class="row">
-            <div class="col-md-3">
-                <h4>รายชื่อ Defect ทั้งหมด</h4>
-            </div>
-            <div class="col-md-7"></div>
-            <div class="col-md-2">
-                <a href="" class="btn btn-outline-info" data-toggle="modal" data-target="#myModal1" style="width: 10rem">
-                    <i class="fas fa-plus"></i> Add defect </a>
-            </div>
-        </div>
+  <div class="card-header text-info">
+    <div class="row">
+      <div class="col-md-3">
+        <h4>รายชื่อ Defect ทั้งหมด</h4>
+      </div>
+      <div class="col-md-7"></div>
+      <div class="col-md-2">
+        <a href="" class="btn btn-outline-info" data-toggle="modal" data-target="#myModal1" style="width: 10rem">
+          <i class="fas fa-plus"></i> Add defect </a>
+      </div>
+    </div>
+
+
+  </div>
+
+  <div class="card-body">
+
+    <div class="container">
+      <div class="row">
+        <table id="example" class="table table-striped " style="width:100%">
+          <thead class="bg-info">
+            <tr class="text-white">
+              <th scope="col">ID</th>
+              <th scope="col">Defect</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for defect in defects%}
+            <tr>
+              <th scope="row">{{defect.id}}</th>
+              <td>{{defect.defect_name}}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
 
 
     </div>
-
-    <div class="card-body">
-
-        <div class="container">
-            <div class="row">
-                <table id="example" class="table table-striped " style="width:100%">
-                    <thead class="bg-info">
-                        <tr class="text-white">
-                            <th scope="col">ID</th>
-                            <th scope="col">Defect</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for defect in defects%}
-                        <tr>
-                            <th scope="row">{{defect.id}}</th>
-                            <td>{{defect.defect_name}}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-
-
-        </div>
-    </div>
+  </div>
 </div>
 
 
 
 <div class="card text-dark bg-light" style="max-width: 80rem; margin: 2rem">
-    <div class="card-header text-info">
+  <div class="card-header text-info">
 
-        <div class="row">
-            <div class="col-md-3">
-                <h4>รายชื่อ Model ทั้งหมด</h4>
-            </div>
+    <div class="row">
+      <div class="col-md-3">
+        <h4>รายชื่อ Model ทั้งหมด</h4>
+      </div>
 
 
-            <div class="col-md-7"></div>
-            <div class="col-md-2">
-                <a href="" class="btn btn-outline-info" data-toggle="modal" data-target="#myModal2" style="width: 10rem"><i class="fas fa-plus"></i> Add Model</a
-      >
+      <div class="col-md-7"></div>
+      <div class="col-md-2">
+        <a href="" class="btn btn-outline-info" data-toggle="modal" data-target="#myModal2" style="width: 10rem"><i
+            class="fas fa-plus"></i> Add Model</a>
+      </div>
     </div>
-  </div>
 
   </div>
-    <div class="card-body ">
+  <div class="card-body ">
 
 
-  <div class="row">
-    {% comment %} <table class="table table-light table-striped "> {% endcomment %}
+    <div class="row">
+      {% comment %} <table class="table table-light table-striped "> {% endcomment %}
 
-   <table id="example1" class="table table-striped" style="width:100%">
-      <thead class="bg-info">
-           <tr class="text-white">
-          <th scope="col">ID</th>
-          <th scope="col">Code</th>
-          <th scope="col">Name</th>
-          <th scope="col">description</th>
-          <th scope="col">Image</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for modelGlass in modelGlasss%}
-        <tr>
-          <th scope="row">{{modelGlass.id}}</th>
-          <td>{{modelGlass.model_code}}</td>
-          <td>{{modelGlass.model_name}}</td>
-          <td>{{modelGlass.model_desc}}</td>
-          <td><img src="{{modelGlass.model_image}}"  width="200" height="200"></td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+        <table id="example1" class="table table-striped" style="width:100%">
+          <thead class="bg-info">
+            <tr class="text-white">
+              <th scope="col">ID</th>
+              <th scope="col">Code</th>
+              <th scope="col">Name</th>
+              <th scope="col">description</th>
+              <th scope="col">Image</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for modelGlass in modelGlasss%}
+            <tr>
+              <th scope="row">{{modelGlass.id}}</th>
+              <td>{{modelGlass.model_code}}</td>
+              <td>{{modelGlass.model_name}}</td>
+              <td>{{modelGlass.model_desc}}</td>
+              <td><img src="{{modelGlass.model_image}}" width="200" height="200"></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+    </div>
+
   </div>
-  
 </div>
 </div>
-  </div>
-  </div>
+</div>
 
 
 
 <!-- Modal -->
-<div
-  class="modal fade"
-  id="myModal1"
-  tabindex="-1"
-  role="dialog"
-  aria-labelledby="myModalLabel"
-  aria-hidden="true"
->
+<div class="modal fade" id="myModal1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
     <div class="modal-content">
       <div class="modal-header">
-       
+
         <h5 class="modal-title" id="exampleModalLabel">Add Defect</h5>
-        <button
-          type="button"
-          class="close"
-          data-dismiss="modal"
-          aria-label="Close"
-        >
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
       <div class="modal-body">
-          <form class="row g-3" action="/addDefect" method="post">
+        <form class="row g-3" action="/addDefect" method="post">
           {% csrf_token %}
-            <div>
+          <div>
             <label for="defect_name" class="form-label">Name of Defect</label>
-            <input
-              type="text"
-              class="form-control"
-              id="defect_name"
-              name="defect_name"
-              required
-            />
+            <input type="text" class="form-control" id="defect_name" name="defect_name" required />
           </div>
-          
-      
-      
-      
+
+
+
+
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-outline-danger" data-dismiss="modal">
@@ -165,72 +152,42 @@
   </div>
 </div>
 
-<div
-  class="modal fade"
-  id="myModal2"
-  tabindex="-1"
-  role="dialog"
-  aria-labelledby="myModalLabel"
-  aria-hidden="true"
->
+<div class="modal fade" id="myModal2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="exampleModalLabel">Add Model</h5>
-        <button
-          type="button"
-          class="close"
-          data-dismiss="modal"
-          aria-label="Close"
-        >
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <div class="modal-body"> 
-      <form class="row g-3" action="/addModel" method="post" enctype="multipart/form-data">
+      <div class="modal-body">
+        <form class="row g-3" action="/addModel" method="post" enctype="multipart/form-data">
           {% csrf_token %}
 
           <div>
             <label for="model_code" class="form-label">Model Code</label>
-            <input
-              type="text"
-              class="form-control"
-              id="model_code"
-              name="model_code"
-              required
-            />
+            <input type="text" class="form-control" id="model_code" name="model_code" required />
           </div>
-      
-           <div>
+
+          <div>
             <label for="model_name" class="form-label">Model Name</label>
-            <input
-              type="text"
-              class="form-control"
-              id="model_name"
-              name="model_name"
-              required
-            />
+            <input type="text" class="form-control" id="model_name" name="model_name" required />
           </div>
 
           <div>
             <label for="model_desc" class="form-label">Model Desc</label>
-            <input
-              type="text"
-              class="form-control"
-              id="model_desc"
-              name="model_desc"
-              required
-            />
+            <input type="text" class="form-control" id="model_desc" name="model_desc" required />
           </div>
-          {{ form.as_p }} 
-            <label for="img">Select image (600x600 px) : </label>
-            <input type="file" id="img" name="img" required>
-           
-         
-      
+          {{ form.as_p }}
+          <label for="img">Select image (600x600 px) : </label>
+          <input type="file" id="img" name="img" required>
+
+
+
       </div>
       <div class="modal-footer">
-         <button type="button" class="btn btn-outline-danger" data-dismiss="modal">
+        <button type="button" class="btn btn-outline-danger" data-dismiss="modal">
           <i class="fas fa-times-circle"></i> Close
         </button>
         <button type="submit" class="btn btn-outline-info"><i class="fas fa-save"></i> Save changes</button>
@@ -242,13 +199,13 @@
 
 
 <script>
-  $(document).ready(function() {
+  $(document).ready(function () {
     $('#example').DataTable();
-} );
+  });
 
-$(document).ready(function() {
+  $(document).ready(function () {
     $('#example1').DataTable();
-} );
+  });
 
 </script>
 

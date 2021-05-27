@@ -26,6 +26,7 @@ urlpatterns = [
     path('home/', views.hello),
     path('createForm/', views.createForm),
     path('addForm', views.addUser),
+    path('report', views.report, name='pie-chart'),
     path('',views.loginForm),
     path('login',views.login),
     path('addDefect', views.addDefect),

@@ -4,6 +4,7 @@ from django.contrib.auth.models import User,auth
 from django.contrib import messages
 from .models import UserProfile
 from django.core.files.storage import FileSystemStorage
+from django.db.models import Count, Case, When, IntegerField
 
 
 
@@ -15,11 +16,32 @@ status_defect_for_check = 0   # 0 คือ ไม่มี defect  /  1  คื
 status_defect_to_nodefect = 0   # 0 คือ ไม่มี defect  /  1  คือ พบ defect
 
 
+
+
+
 def hello(request):
     #Query
     data_defect = Defect.objects.all()
     data_glass = modelGlass.objects.all()
     return render(request,'index.html',{'defects':data_defect,'modelGlasss':data_glass})
+
+
+def report(request):
+    labels = []
+    data = []
+
+    queryset = modelGlassWithDefect.objects.all()
+    for modelGlass in queryset:
+        labels.append(modelGlass.model_name)
+        data.append(modelGlass.number_glass)
+
+    print (modelGlassWithDefect.objects.all().count())
+
+    return render(request, 'report.html', {
+        'labels': labels,
+        'data': data,
+    })
+
 
 def createForm(request):
     return render(request,'form.html')
@@ -406,7 +428,7 @@ def add_defect2(request):
     counter = counter
     
     
-    point_defect = 2
+    point_defect = 1
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -470,7 +492,7 @@ def add_defect3(request):
     
     counter = counter
     
-    point_defect = 3
+    point_defect = 1
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -535,7 +557,7 @@ def add_defect4(request):
     
     counter = counter
     
-    point_defect = 4
+    point_defect = 1
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -604,7 +626,7 @@ def add_defect5(request):
     
     counter = counter
     
-    point_defect = 5
+    point_defect = 1
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -678,7 +700,7 @@ def add_defect6(request):
     counter = counter
     
    
-    point_defect = 6
+    point_defect = 2
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -737,7 +759,7 @@ def add_defect7(request):
     
     counter = counter
     
-    point_defect = 7
+    point_defect = 2
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -800,7 +822,7 @@ def add_defect8(request):
     
     counter = counter
     
-    point_defect = 8
+    point_defect = 2
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -865,7 +887,7 @@ def add_defect9(request):
     
     counter = counter
     
-    point_defect = 9
+    point_defect = 2
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -934,7 +956,7 @@ def add_defect10(request):
     
     counter = counter
     
-    point_defect = 10
+    point_defect = 2
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -1015,7 +1037,7 @@ def add_defect11(request):
     
     counter = counter
     
-    point_defect = 11
+    point_defect = 3
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -1074,7 +1096,7 @@ def add_defect12(request):
     
     counter = counter
     
-    point_defect = 12
+    point_defect = 3
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -1137,7 +1159,7 @@ def add_defect13(request):
     
     counter = counter
     
-    point_defect = 13
+    point_defect = 3
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -1202,7 +1224,7 @@ def add_defect14(request):
     
     counter = counter
     
-    point_defect = 14
+    point_defect = 3
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -1271,7 +1293,7 @@ def add_defect15(request):
     
     counter = counter
     
-    point_defect = 15
+    point_defect = 3
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -1348,7 +1370,7 @@ def add_defect16(request):
     
     counter = counter
     
-    point_defect = 16
+    point_defect = 4
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -1407,7 +1429,7 @@ def add_defect17(request):
     
     counter = counter
     
-    point_defect = 17
+    point_defect = 4
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -1470,7 +1492,7 @@ def add_defect18(request):
     
     counter = counter
     
-    point_defect = 18
+    point_defect = 4
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -1535,7 +1557,7 @@ def add_defect19(request):
     
     counter = counter
     
-    point_defect = 19
+    point_defect = 4
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -1604,7 +1626,7 @@ def add_defect20(request):
     
     counter = counter
     
-    point_defect = 20
+    point_defect = 4
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -1679,7 +1701,7 @@ def add_defect21(request):
     
     counter = counter
     
-    point_defect = 21
+    point_defect = 5
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -1738,7 +1760,7 @@ def add_defect22(request):
     
     counter = counter
     
-    point_defect = 22
+    point_defect = 5
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -1801,7 +1823,7 @@ def add_defect23(request):
     
     counter = counter
     
-    point_defect = 23
+    point_defect = 5
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -1866,7 +1888,7 @@ def add_defect24(request):
     
     counter = counter
     
-    point_defect = 24
+    point_defect = 5
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -1935,7 +1957,7 @@ def add_defect25(request):
     
     counter = counter
     
-    point_defect = 25
+    point_defect = 5
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -2012,7 +2034,7 @@ def add_defect26(request):
     counter = counter
     
    
-    point_defect = 26
+    point_defect = 6
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -2071,7 +2093,7 @@ def add_defect27(request):
     
     counter = counter
     
-    point_defect = 27
+    point_defect = 6
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -2134,7 +2156,7 @@ def add_defect28(request):
     
     counter = counter
     
-    point_defect = 28
+    point_defect = 6
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -2199,7 +2221,7 @@ def add_defect29(request):
     
     counter = counter
     
-    point_defect = 29
+    point_defect = 6
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -2269,7 +2291,7 @@ def add_defect30(request):
     counter = counter
     
  
-    point_defect = 30
+    point_defect = 6
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -2345,7 +2367,7 @@ def add_defect31(request):
     
     counter = counter
     
-    point_defect = 31
+    point_defect = 7
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -2404,7 +2426,7 @@ def add_defect32(request):
     
     counter = counter
     
-    point_defect = 32
+    point_defect = 7
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -2467,7 +2489,7 @@ def add_defect33(request):
     
     counter = counter
     
-    point_defect = 33
+    point_defect = 7
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -2532,7 +2554,7 @@ def add_defect34(request):
     
     counter = counter
     
-    point_defect = 34
+    point_defect = 7
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -2601,7 +2623,7 @@ def add_defect35(request):
     
     counter = counter
     
-    point_defect = 35
+    point_defect = 7
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -2676,7 +2698,7 @@ def add_defect36(request):
     
     counter = counter
     
-    point_defect = 36
+    point_defect = 8
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -2735,7 +2757,7 @@ def add_defect37(request):
     
     counter = counter
     
-    point_defect = 37
+    point_defect = 8
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -2798,7 +2820,7 @@ def add_defect38(request):
     
     counter = counter
     
-    point_defect = 38
+    point_defect = 8
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -2863,7 +2885,7 @@ def add_defect39(request):
     
     counter = counter
     
-    point_defect = 39
+    point_defect = 8
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -2932,7 +2954,7 @@ def add_defect40(request):
     
     counter = counter
     
-    point_defect = 40
+    point_defect = 8
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -3007,7 +3029,7 @@ def add_defect41(request):
     
     counter = counter
     
-    point_defect = 41
+    point_defect = 9
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -3066,7 +3088,7 @@ def add_defect42(request):
     
     counter = counter
     
-    point_defect = 42
+    point_defect = 9
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -3129,7 +3151,7 @@ def add_defect43(request):
     
     counter = counter
     
-    point_defect = 43
+    point_defect = 9
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -3194,7 +3216,7 @@ def add_defect44(request):
     
     counter = counter
     
-    point_defect = 44
+    point_defect = 9
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -3263,7 +3285,7 @@ def add_defect45(request):
     
     counter = counter
     
-    point_defect = 45
+    point_defect = 9
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -3338,7 +3360,7 @@ def add_defect46(request):
     
     counter = counter
     
-    point_defect = 46
+    point_defect = 10
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -3397,7 +3419,7 @@ def add_defect47(request):
     
     counter = counter
     
-    point_defect = 47
+    point_defect = 10
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -3460,7 +3482,7 @@ def add_defect48(request):
     
     counter = counter
     
-    point_defect = 48
+    point_defect = 10
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -3525,7 +3547,7 @@ def add_defect49(request):
     
     counter = counter
     
-    point_defect = 49
+    point_defect = 10
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -3594,7 +3616,7 @@ def add_defect50(request):
     
     counter = counter
     
-    point_defect = 50
+    point_defect = 10
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -3669,7 +3691,7 @@ def add_defect51(request):
     
     counter = counter
     
-    point_defect = 51
+    point_defect = 11
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -3728,7 +3750,7 @@ def add_defect52(request):
     
     counter = counter
     
-    point_defect = 52
+    point_defect = 11
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -3791,7 +3813,7 @@ def add_defect53(request):
     
     counter = counter
     
-    point_defect = 53
+    point_defect = 11
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -3856,7 +3878,7 @@ def add_defect54(request):
     
     counter = counter
     
-    point_defect = 54
+    point_defect = 11
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -3925,7 +3947,7 @@ def add_defect55(request):
     
     counter = counter
     
-    point_defect = 55
+    point_defect = 11
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -4002,7 +4024,7 @@ def add_defect56(request):
     counter = counter
     
    
-    point_defect = 56
+    point_defect = 12
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -4061,7 +4083,7 @@ def add_defect57(request):
     
     counter = counter
     
-    point_defect = 57
+    point_defect = 12
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -4124,7 +4146,7 @@ def add_defect58(request):
     
     counter = counter
     
-    point_defect = 58
+    point_defect = 12
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -4189,7 +4211,7 @@ def add_defect59(request):
     
     counter = counter
     
-    point_defect = 59
+    point_defect = 12
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
@@ -4258,7 +4280,7 @@ def add_defect60(request):
     
     counter = counter
     
-    point_defect = 60
+    point_defect = 12
     data_defect = Defect.objects.all()
     department = request.POST['department']
 
