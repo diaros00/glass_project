@@ -31,15 +31,48 @@ def report(request):
     data = []
 
     queryset = modelGlassWithDefect.objects.all()
-    for modelGlass in queryset:
-        labels.append(modelGlass.model_name)
-        data.append(modelGlass.number_glass)
+    data_defect = Defect.objects.all()
+    # print('data_defect >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ,data_defect[0].defect_name)
+    count_defect_name1 = 0
+    count_defect_name2 = 0
+    count_defect_name3 = 0
+    count_defect_name4 = 0
+    count_defect_name5 = 0
 
-    print (modelGlassWithDefect.objects.all().count())
+    for i in range(Defect.objects.all().count()):
 
-    return render(request, 'report.html', {
+        count_defect_name1_temp = modelGlassWithDefect.objects.filter(defect_name1=data_defect[i].defect_name).count()
+        count_defect_name2_temp = modelGlassWithDefect.objects.filter(defect_name2=data_defect[i].defect_name).count()
+        count_defect_name3_temp = modelGlassWithDefect.objects.filter(defect_name3=data_defect[i].defect_name).count()
+        count_defect_name4_temp = modelGlassWithDefect.objects.filter(defect_name4=data_defect[i].defect_name).count()
+        count_defect_name5_temp = modelGlassWithDefect.objects.filter(defect_name5=data_defect[i].defect_name).count()
+
+        count_defect_name1 = count_defect_name1 + count_defect_name1_temp
+        count_defect_name2 = count_defect_name2 + count_defect_name2_temp
+        count_defect_name3 = count_defect_name3 + count_defect_name3_temp
+        count_defect_name4 = count_defect_name4 + count_defect_name4_temp
+        count_defect_name5 = count_defect_name5 + count_defect_name5_temp
+
+        count_defect_all = count_defect_name1 + count_defect_name2 + count_defect_name3 + count_defect_name4 + count_defect_name5
+
+        print(data_defect[i].defect_name, ' = ' ,count_defect_all)
+
+        labels.append(data_defect[i].defect_name)
+        data.append(count_defect_all)
+
+    
+    
+        
+    # for modelGlass in queryset:
+    #     labels.append(modelGlass.model_name)
+    #     data.append(data_defect.defect_name)
+
+    
+
+    return  render(request, 'report.html', {
         'labels': labels,
         'data': data,
+        'defects':data_defect
     })
 
 

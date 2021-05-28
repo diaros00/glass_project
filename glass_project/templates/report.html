@@ -2,44 +2,217 @@
 {% load static %}
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
 
-<canvas id="myChart" width="400" height="400"></canvas>
+<div class="row">
+    <div class="col-2">
+        <div style="margin-top: 2rem ">
+            <a class="btn btn-outline-info btn-lg shadow" href="/home">
+                <i class="fas fa-arrow-alt-circle-left"></i> Back</a>
+        </div>
+    </div>
+    <div class="col-10">
+
+
+        <div class="card shadow" style="margin-top: 2rem">
+            <div class="card-header">
+                <h4>Report</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6"><canvas id="myChart" width="500" height="400"></canvas></div>
+                    <div class="col-md-6"><canvas id="myChart1" width="500" height="400"></canvas></div>
+                </div>
+            </div>
+            <div class="card-footer">
+
+
+
+                <div class="row" style="margin-top: 1rem">
+
+                    <div class="col-6">
+
+
+                        <div class="input-group">
+
+
+                            <label class="input-group-text" for="inputDefectP1_box1_defect1">Defect 1</label>
+                            <select class="form-select" id="inputDefectP1_box1_defect1"
+                                name="inputDefectP1_box1_defect1" required>
+                                <option value="">กรุณาเลือก defect</option>
+
+                                {% for defect in defects %}
+
+                                <option value="{{defect.id}}">
+                                    {{defect.defect_name}}
+                                </option>
+
+                                {% endfor %}
+                            </select>
+
+                        </div>
+                    </div>
+
+
+                    <div class="col-6">
+                        <div class="input-group">
+                            <label class="input-group-text" for="shift">Shift</label>
+                            <select class="form-select" id="shift" name="shift" required="">
+                                <option value="">กรุณาเลือกกะเวลาทำงาน</option>
+                                <option value="1">A</option>
+                                <option value="2">B</option>
+                                <option value="3">C</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row" style="margin-top: 1rem">
+                    <div class="col-md-6"><b>Start date</b></div>
+                    <div class="col-md-6"><b>End date</b></div>
+
+                </div>
+
+                <div class="row" style="margin-top: 1rem">
+                    <div class="col-md-6"> <input type="date" id="datepicker" name="datepicker" class="form-control"
+                            placeholder="Start date"></div>
+                    <div class="col-md-6"><input type="date" id="datepicker" name="datepicker" class="form-control"
+                            placeholder="End date"></div>
+
+
+                </div>
+
+
+
+
+
+
+
+                <div class="row" style="padding: 1rem; ">
+                    <button class="btn btn-info btn-block" type="submit">Submit</button>
+
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+</div>
+
+
+
 <script>
+
     var ctx = document.getElementById('myChart').getContext('2d');
     var myChart = new Chart(ctx, {
-        type: 'bar',
+        type: 'pie',
         data: {
-            labels: {{labels|safe}},
-            datasets: [{
-                label: '# of Votes',
-                data: {{data|safe}},
-                backgroundColor: [
-                    'rgba(255, 99, 132, 0.2)',
-                    'rgba(54, 162, 235, 0.2)',
-                    'rgba(255, 206, 86, 0.2)',
-                    'rgba(75, 192, 192, 0.2)'
-                    
-                ],
-                borderColor: [
-                    'rgba(255, 99, 132, 1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)',
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(153, 102, 255, 1)',
-                    'rgba(255, 159, 64, 1)'
-                ],
-                borderWidth: 1
+            labels: {{ labels| safe}},
+    datasets: [{
+        label: {{ labels| safe}},
+
+        data: {{ data| safe}},
+        backgroundColor: [
+        '#2596FA',
+        '#2BE0B1',
+        '#DBDE57',
+        'rgb(54, 162, 235)',
+        'rgb(255, 99, 132)',
+        'rgb(75, 192, 192)',
+
+
+    ],
+
+        borderWidth: 1
             }]
         },
-        options: {
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
+    options: {
+
+        indexAxis: 'y',
+            // Elements options apply to all of the options unless overridden in a dataset
+            // In this case, we are setting the border of each horizontal bar to be 2px wide
+            elements: {
+            bar: {
+                borderWidth: 2,
+      }
+        },
+        responsive: true,
+            plugins: {
+
+            title: {
+                display: true,
+                    text: 'Doughnut Chart'
+            },
+            datalabels: {
+                color: '#36A2EB'
+            },
+
+
+
+
+        }
+    },
+    
+    
+    });
+
+
+</script>
+
+
+<script>
+    var ctx = document.getElementById('myChart1').getContext('2d');
+    var myChart1 = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: {{ labels| safe}},
+    datasets: [{
+        label: "defect",
+
+        data: {{ data| safe}},
+        backgroundColor: [
+        '#2596FA',
+        '#2BE0B1',
+        '#DBDE57',
+        'rgb(54, 162, 235)',
+        'rgb(255, 99, 132)',
+        'rgb(75, 192, 192)',
+
+
+    ],
+
+        borderWidth: 1
+            }]
+        },
+    options: {
+        indexAxis: 'y',
+            // Elements options apply to all of the options unless overridden in a dataset
+            // In this case, we are setting the border of each horizontal bar to be 2px wide
+            elements: {
+            bar: {
+                borderWidth: 2,
+      }
+        },
+        responsive: true,
+            plugins: {
+            legend: {
+                position: 'right',
+      },
+            title: {
+                display: true,
+                    text: 'Horizontal Bar Chart'
             }
         }
+    },
+    
+    
     });
+
+
 </script>
+
+
+
 
 
 {% endblock %}
