@@ -46,7 +46,7 @@
           <div class=" row ">
 
             <div style=" overflow-x:auto;">
-              <table id="example1 " class="table table-striped " style="width:100% ">
+              <table id="example1 " class="table table-striped table-bordered " style="width:100% ">
                 <thead>
                   <tr style="font-weight:bold; ">
                     <th scope="col ">Name Operator</th>
@@ -70,9 +70,6 @@
                     <td>{{shift}}</td>
                     <td>{{datepick}}</td>
                     <td>{{datepick_for_check}}</td>
-
-
-
 
                   </tr>
 
@@ -1750,7 +1747,7 @@
 
           <div id="box4_4">
             <form action="/add_defect19" method="post" enctype="multipart/form-data">
-
+              {% csrf_token %}
               <div class="input-group mb-3">
                 <label class="input-group-text" for="inputDefectP4_box4_defect1">Defect 1</label>
 
@@ -2160,7 +2157,7 @@
 
           <div id="box4_5">
             <form action="/add_defect24" method="post" enctype="multipart/form-data">
-
+              {% csrf_token %}
               <div class="input-group mb-3">
                 <label class="input-group-text" for="inputDefectP5_box4_defect1">Defect 1</label>
 

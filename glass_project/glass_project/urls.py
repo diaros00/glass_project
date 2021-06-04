@@ -36,6 +36,7 @@ urlpatterns = [
     path('choose_defect_on_glass',views.choose_defect_on_glass),
     path('add_no_defect',views.add_no_defect),
     path('add_have_defect',views.add_have_defect),
+    path('filtering',views.filtering),
     path('add_defect1',views.add_defect1),
     path('add_defect2',views.add_defect2),
     path('add_defect3',views.add_defect3),

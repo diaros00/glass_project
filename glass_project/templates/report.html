@@ -2,12 +2,113 @@
 {% load static %}
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@0.7.0"></script>
+<style>
+    .modal-backdrop {
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: -100;
+
+    }
+</style>
+
+
+
+<div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvas1">
+    <div class="offcanvas-header">
+        <h3 class="offcanvas-title">Filter </h3>
+        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <div>
+            <div class="card shadow">
+
+                <div class="card-body">
+                    <div class="row" style="margin-top: 1rem">
+
+
+
+                        <form action="/filtering" method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="input-group">
+
+                                <label class="input-group-text" for="inputDefect">Defect 1</label>
+                                <select class="form-select" id="inputDefect" name="inputDefect">
+                                    <option value="ALL">ALL</option>
+
+                                    {% for defect in defects %}
+
+                                    <option value="{{defect.id}}">
+                                        {{defect.defect_name}}
+                                    </option>
+                                    {% endfor %}
+
+                                </select>
+                            </div>
+
+
+
+
+                    </div>
+
+
+
+
+                    <div class="row" style="margin-top: 1rem">
+                        <div class="input-group">
+                            <label class="input-group-text" for="shift">Shift</label>
+                            <select class="form-select" id="shift" name="shift">
+                                <option value="ALL">ALL</option>
+                                <option value="A">A</option>
+                                <option value="B">B</option>
+                                <option value="C">C</option>
+                            </select>
+                        </div>
+
+                    </div>
+
+
+                    <div class="row" style="margin-top: 1rem">
+                        <div class="col-md-6"><b>Start date</b></div>
+                        <div class="col-md-6"><b>End date</b></div>
+
+                    </div>
+
+                    <div class="row" style="margin-top: 1rem">
+                        <div class="col-md-6"> <input type="date" id="start_date" name="start_date" class="form-control"
+                                placeholder="Start date"></div>
+                        <div class="col-md-6"><input type="date" id="end_date" name="end_date" class="form-control"
+                                placeholder="End date"></div>
+
+
+                    </div>
+
+
+
+                    <div class="row" style="padding-left: 1rem; padding-top: 1rem; ">
+                        <div class="col-8"></div>
+                        <div class="col-4"><button class="btn btn-info btn-block" type="submit"
+                                style="color:whitesmoke;">Apply</button></div>
+
+
+                    </div>
+                    </form>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+</div>
 
 <div class="row">
     <div class="col-2">
         <div style="margin-top: 2rem ">
-            <a class="btn btn-outline-info btn-lg shadow" href="/home">
+            <a class="btn btn-outline-info btn-block btn-lg shadow" href="/home">
                 <i class="fas fa-arrow-alt-circle-left"></i> Back</a>
         </div>
     </div>
@@ -16,88 +117,106 @@
 
         <div class="card shadow" style="margin-top: 2rem">
             <div class="card-header">
-                <h4>Report</h4>
+                <div class="row">
+                    <div class="col-10">
+                        <h4>Report Glass Defect</h4>
+                    </div>
+                    <div class="col-2"><button class="btn btn-primary btn-block btn-lg" type="button"
+                            data-bs-toggle="offcanvas" data-bs-target="#offcanvas1" aria-controls="offcanvasExample">
+                            <i class="fas fa-filter"></i> Filter
+                        </button></div>
+                </div>
+
+
+
             </div>
             <div class="card-body">
-                <div class="row">
+
+
+                <div class="row" style="margin-top: 1rem">
                     <div class="col-md-6"><canvas id="myChart" width="500" height="400"></canvas></div>
                     <div class="col-md-6"><canvas id="myChart1" width="500" height="400"></canvas></div>
                 </div>
+
+
+
+                <div style="margin-top: 2rem;">
+                    <button type="button" class="btn btn-primary">
+                        <h5>Glass ที่มี defect ทั้งหมด</h5>
+                    </button>
+                </div>
+
+                <link href="https://unpkg.com/bootstrap-table@1.18.3/dist/bootstrap-table.min.css" rel="stylesheet">
+
+                <script src="https://unpkg.com/bootstrap-table@1.18.3/dist/bootstrap-table.min.js"></script>
+
+                <div style="overflow-x:auto; margin-top: 1rem;">
+                    <table id="example" class="table table-striped table-bordered dt-responsive nowrap"
+                        style="width:100%">
+
+
+                        <thead>
+                            <tr style=" font-weight:bold; color:#FFF; text-align:center; background:#2f333e;"
+                                role="row">
+                                <th scope="col">ID</th>
+                                <th scope="col">Date Create</th>
+                                <th scope="col">Model Code</th>
+                                <th scope="col">Model Name</th>
+                                <th scope="col">Defect</th>
+                                <th scope="col">Point defect</th>
+                                <th scope="col">Department</th>
+                                <th scope="col">Shift</th>
+
+
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for data_defect in data_defects %}
+                            <tr>
+                                <th scope="row">{{data_defect.id}}</th>
+                                <td>{{data_defect.date_create}}</td>
+                                <td>{{data_defect.model_code}}</td>
+                                <td>{{data_defect.model_name}}</td>
+                                <td>{{data_defect.defect_name1}},
+                                    {% if data_defect.defect_name2 %}
+                                    {{data_defect.defect_name2}}
+                                    {% endif %},
+                                    {% if data_defect.defect_name3 %}
+                                    {{data_defect.defect_name3}}
+                                    {% endif %},
+                                    {% if data_defect.defect_name4 %}
+                                    {{data_defect.defect_name4}}
+                                    {% endif %},
+                                    {% if data_defect.defect_name5 %}
+                                    {{data_defect.defect_name5}}
+                                    {% endif %}
+                                </td>
+
+                                <td>{{data_defect.point_defect}}</td>
+                                <td>{{data_defect.department}}</td>
+                                <td>{{data_defect.shift}}</td>
+
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
             </div>
             <div class="card-footer">
 
 
 
-                <div class="row" style="margin-top: 1rem">
-
-                    <div class="col-6">
-
-
-                        <div class="input-group">
-
-
-                            <label class="input-group-text" for="inputDefectP1_box1_defect1">Defect 1</label>
-                            <select class="form-select" id="inputDefectP1_box1_defect1"
-                                name="inputDefectP1_box1_defect1" required>
-                                <option value="">กรุณาเลือก defect</option>
-
-                                {% for defect in defects %}
-
-                                <option value="{{defect.id}}">
-                                    {{defect.defect_name}}
-                                </option>
-
-                                {% endfor %}
-                            </select>
-
-                        </div>
-                    </div>
-
-
-                    <div class="col-6">
-                        <div class="input-group">
-                            <label class="input-group-text" for="shift">Shift</label>
-                            <select class="form-select" id="shift" name="shift" required="">
-                                <option value="">กรุณาเลือกกะเวลาทำงาน</option>
-                                <option value="1">A</option>
-                                <option value="2">B</option>
-                                <option value="3">C</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row" style="margin-top: 1rem">
-                    <div class="col-md-6"><b>Start date</b></div>
-                    <div class="col-md-6"><b>End date</b></div>
-
-                </div>
-
-                <div class="row" style="margin-top: 1rem">
-                    <div class="col-md-6"> <input type="date" id="datepicker" name="datepicker" class="form-control"
-                            placeholder="Start date"></div>
-                    <div class="col-md-6"><input type="date" id="datepicker" name="datepicker" class="form-control"
-                            placeholder="End date"></div>
-
-
-                </div>
-
-
-
-
-
-
-
-                <div class="row" style="padding: 1rem; ">
-                    <button class="btn btn-info btn-block" type="submit">Submit</button>
-
-                </div>
             </div>
         </div>
 
 
     </div>
 </div>
+
+
+
 
 
 
@@ -127,33 +246,40 @@
             }]
         },
     options: {
-
-        indexAxis: 'y',
-            // Elements options apply to all of the options unless overridden in a dataset
-            // In this case, we are setting the border of each horizontal bar to be 2px wide
-            elements: {
-            bar: {
-                borderWidth: 2,
-      }
-        },
-        responsive: true,
-            plugins: {
-
-            title: {
-                display: true,
-                    text: 'Doughnut Chart'
-            },
+        plugins: {
             datalabels: {
-                color: '#36A2EB'
+
+                borderColor: 'white',
+                    // borderRadius: 100,
+                    //     borderWidth: 2,
+                    color: 'white',
+
+                        font: {
+                    weight: 'bold'
+                },
+                padding: 10,
+                    formatter: Math.round
+            }
+        },
+
+        // Core options
+        aspectRatio: 4 / 3,
+            cutoutPercentage: 32,
+                layout: {
+            padding: 32
+        },
+        elements: {
+            line: {
+                fill: false
             },
+            point: {
+                hoverRadius: 7,
+                    radius: 5
+            }
+        },
+    }
 
 
-
-
-        }
-    },
-    
-    
     });
 
 
@@ -185,27 +311,48 @@
             }]
         },
     options: {
-        indexAxis: 'y',
-            // Elements options apply to all of the options unless overridden in a dataset
-            // In this case, we are setting the border of each horizontal bar to be 2px wide
-            elements: {
-            bar: {
-                borderWidth: 2,
-      }
-        },
-        responsive: true,
-            plugins: {
-            legend: {
-                position: 'right',
-      },
-            title: {
-                display: true,
-                    text: 'Horizontal Bar Chart'
+        plugins: {
+
+            datalabels: {
+                color: 'white',
+
+                    font: {
+                    weight: 'bold'
+                },
+                formatter: Math.round
             }
+        },
+
+        // Core options
+        aspectRatio: 5 / 3,
+            layout: {
+            padding: {
+                top: 24,
+                    right: 16,
+                        bottom: 0,
+                            left: 8
+            }
+        },
+        elements: {
+            line: {
+                fill: false
+            },
+            point: {
+                hoverRadius: 7,
+                    radius: 5
+            }
+        },
+        scales: {
+            xAxes: [{
+                stacked: true
+            }],
+                yAxes: [{
+                    stacked: true
+                }]
         }
-    },
-    
-    
+    }
+
+
     });
 
 
@@ -214,5 +361,29 @@
 
 
 
+<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+<script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.7.0/js/dataTables.buttons.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.7.0/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.7.0/js/buttons.print.min.js"></script>
+
+
+<script>
+
+
+    $(document).ready(function () {
+        $('#example').DataTable({
+            dom: 'Bfrtip',
+            buttons: [
+                'copy', 'csv', 'excel', 'print'
+            ]
+        });
+    });
+
+
+</script>
 
 {% endblock %}

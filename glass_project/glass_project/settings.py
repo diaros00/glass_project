@@ -26,9 +26,10 @@ SECRET_KEY = 'django-insecure-cg8oa)h0mo9&@w$fgbq36y&hi4qfd&1aqxd_=@8!%+&91@d(n$
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '183.88.226.202']
-
-
+########  สำหรับอัพขึ้น docker ####################################
+# ALLOWED_HOSTS = ['localhost', '127.0.0.1', '183.88.226.202']
+##################################################################
+ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
@@ -39,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'blogs',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -87,27 +89,43 @@ DATABASES = {
         # 'PORT': '3306',
 
 
+##########################################################################
+        # for window xxamp
+        'ENGINE': 'django.db.backends.mysql', 
+        'NAME': 'djangodb',
+        'USER': 'admin',
+        'PASSWORD': 'itpwd8501',
+        'HOST': '127.0.0.1',
+        'PORT': '3306',
+
+
+##########################################################################
         # # for window xxamp เก่า
         # 'ENGINE': 'django.db.backends.mysql', 
         # 'NAME': 'glass_project',
         # 'USER': 'adminjo',
         # 'PASSWORD': 'itpwd8501',
 
-        # # on host mk.jsr.co.th
-        # 'HOST': '200.1.1.52',
-        # 'PORT': '3307',
+        # # # on host mk.jsr.co.th
+        # # 'HOST': '200.1.1.52',
+        # # 'PORT': '3307',
 
-
+##########################################################################
 
          # for window IIS
-        'ENGINE': 'django.db.backends.mysql', 
-        'NAME': 'glass_project',
-        'USER': 'admin',
-        'PASSWORD': 'itpwd8501',
+        # 'ENGINE': 'django.db.backends.mysql', 
+        # 'NAME': 'glass_project',
+        # 'USER': 'admin',
+        # 'PASSWORD': 'itpwd8501',
 
-        # on host mk.jsr.co.th
-        'HOST': '200.1.1.52',
-        'PORT': '3306',
+        # # on host mk.jsr.co.th
+        # 'HOST': '200.1.1.52',
+        # 'PORT': '3306',
+       
+
+##########################################################################
+
+
 
 
         # for window and server is on host open

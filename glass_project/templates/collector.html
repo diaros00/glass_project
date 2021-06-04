@@ -47,8 +47,8 @@
 
 <div class="row">
   <div class="col col-md-2">
-    <div style="margin: 2rem 2rem 0rem 2rem; ">
-      <a class="btn btn-outline-info btn-lg" href="/home">
+    <div style="margin: 2rem 0rem 0rem 0rem; ">
+      <a class="btn btn-outline-info btn-block btn-lg" href="/home">
         <i class="fas fa-arrow-alt-circle-left"></i> Back</a>
     </div>
   </div>
@@ -73,13 +73,26 @@
 
             </div>
           </div>
+
+
+
+
+
+
+
+
+
+
+
           <div id="accordion">
             <div class="row" style="margin-top: 1rem; padding-left: 1rem; padding-right: 1rem">
               <a class="btn btn-info" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true"
                 aria-controls="collapseOne" style="color: aliceblue;">
+
                 <i class="fas fa-chevron-circle-down"></i> by Model Code
               </a>
               <div id="collapseOne" class="collapse my-2" data-parent="#accordion">
+
                 <div class="card">
                   <div class="card-body">
                     <div class="row" style="margin-top: 1rem">
@@ -193,9 +206,9 @@
               <label class="input-group-text" for="shift">Shift</label>
               <select class="form-select" id="shift" name="shift" required>
                 <option value="">กรุณาเลือกกะเวลาทำงาน</option>
-                <option value="1">A</option>
-                <option value="2">B</option>
-                <option value="3">C</option>
+                <option value="A">A</option>
+                <option value="B">B</option>
+                <option value="C">C</option>
               </select>
             </div>
           </div>
@@ -206,7 +219,7 @@
         <div class="row">
           <div class="col col-9"></div>
           <div class="col col-3">
-            <button type="submit" class="btn btn-info btn-block">
+            <button type="submit" class="btn btn-info btn-block btn-lg b">
               Next <i class="fas fa-arrow-alt-circle-right"></i>
             </button>
             </form>
@@ -220,6 +233,7 @@
 
 
   <script>
+
     $('#datepicker').datepicker({
       uiLibrary: 'bootstrap4',
     })
@@ -230,6 +244,10 @@
     var collapseList = collapseElementList.map(function (collapseEl) {
       return new bootstrap.Collapse(collapseEl)
     })
+    // var collapseElementList = [].slice.call(document.querySelectorAll('.collapse'))
+    // var collapseList = collapseElementList.map(function (collapseEl) {
+    //   return new bootstrap.Collapse(collapseEl)
+    // })
   </script>
   {% endblock %}
 </div>

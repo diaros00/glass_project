@@ -5,7 +5,12 @@ from django.contrib import messages
 from .models import UserProfile
 from django.core.files.storage import FileSystemStorage
 from django.db.models import Count, Case, When, IntegerField
-
+import datetime
+from datetime import timedelta
+from datetime import datetime
+from django.db.models import Q
+from decimal import Decimal
+from collections import Counter
 
 
 counter = 0
@@ -27,10 +32,11 @@ def hello(request):
 
 
 def report(request):
+    
     labels = []
     data = []
 
-    queryset = modelGlassWithDefect.objects.all()
+    queryset = modelGlassWithDefect.objects.filter(status_glass="NG")
     data_defect = Defect.objects.all()
     # print('data_defect >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ,data_defect[0].defect_name)
     count_defect_name1 = 0
@@ -60,20 +66,643 @@ def report(request):
         labels.append(data_defect[i].defect_name)
         data.append(count_defect_all)
 
-    
-    
-        
-    # for modelGlass in queryset:
-    #     labels.append(modelGlass.model_name)
-    #     data.append(data_defect.defect_name)
-
-    
 
     return  render(request, 'report.html', {
         'labels': labels,
         'data': data,
-        'defects':data_defect
+        'defects':data_defect,
+        'data_defects':queryset
     })
+def filtering(request): 
+    labels = []
+    data = []
+    inputDefect = request.POST['inputDefect']
+    shift = request.POST['shift']
+    start_date = request.POST['start_date']
+    end_date = request.POST['end_date']
+
+
+
+
+    print("shift : ",shift)
+    print("start_date : ",start_date)
+    print("end_date : ",end_date)
+    data_defect = Defect.objects.all()
+    count_defect_name1 = 0
+    count_defect_name2 = 0
+    count_defect_name3 = 0
+    count_defect_name4 = 0
+    count_defect_name5 = 0
+
+   
+        
+    #-------------------->>>>> inputDefect  ALL
+    if inputDefect == 'ALL' :
+        
+        if shift == 'ALL' :
+            #-------------------->>>>> defect ALL + shift ALL  +  Date  
+            if start_date:
+                print("#-------------------->>>>> defect ALL + shift ALL  +  Date   1")
+                queryset = modelGlassWithDefect.objects.filter(date_create__range=(start_date, end_date)).filter(status_glass="NG")
+                count_row_mix = modelGlassWithDefect.objects.filter(date_create__range=(start_date, end_date)).filter(status_glass="NG").count()
+
+                
+                list_of_label = []
+                
+
+                for i in range(count_row_mix):
+                    for k in range(data_defect.count()):
+                        if data_defect[k].defect_name == queryset[i].defect_name1:
+                            count_defect_name1_temp = 1
+                            count_defect_name1 = count_defect_name1 + count_defect_name1_temp
+                            list_of_label.append(data_defect[k].defect_name)
+                            
+                        if data_defect[k].defect_name == queryset[i].defect_name2:
+                            count_defect_name2_temp = 1
+                            count_defect_name2 = count_defect_name2 + count_defect_name2_temp
+                            list_of_label.append(data_defect[k].defect_name)
+                            
+                        if data_defect[k].defect_name == queryset[i].defect_name3:
+                            count_defect_name3_temp = 1
+                            count_defect_name3 = count_defect_name3 + count_defect_name3_temp
+                            list_of_label.append(data_defect[k].defect_name)
+                            
+                        if data_defect[k].defect_name == queryset[i].defect_name4:
+                            count_defect_name4_temp = 1
+                            count_defect_name4 = count_defect_name4 + count_defect_name4_temp
+                            list_of_label.append(data_defect[k].defect_name)
+                            
+                        if data_defect[k].defect_name == queryset[i].defect_name5:
+                            count_defect_name5_temp = 1
+                            count_defect_name5 = count_defect_name5 + count_defect_name5_temp
+                            list_of_label.append(data_defect[k].defect_name)
+                        
+                        
+                        # count_defect_all = count_defect_name1 + count_defect_name2 + count_defect_name3 + count_defect_name4 + count_defect_name5
+        
+                print(list_of_label)
+
+                Counter(list_of_label).keys() # equals to list(set(words))
+                Counter(list_of_label).values() # counts the elements' frequency
+                label_list = list(Counter(list_of_label).keys())
+                data_list = list(Counter(list_of_label).values())
+                print(len(label_list))
+                for i in range(len(label_list)):  # จัดเก็บลง label กับ data
+                    labels.append(label_list[i])   
+                    data.append(data_list[i])
+
+                print(labels)
+                print(data)
+
+
+                # for i in range(Defect.objects.all().count()):
+                #     count_defect_name1_temp = modelGlassWithDefect.objects.filter(defect_name1=data_defect[i].defect_name).count()
+                #     count_defect_name2_temp = modelGlassWithDefect.objects.filter(defect_name2=data_defect[i].defect_name).count()
+                #     count_defect_name3_temp = modelGlassWithDefect.objects.filter(defect_name3=data_defect[i].defect_name).count()
+                #     count_defect_name4_temp = modelGlassWithDefect.objects.filter(defect_name4=data_defect[i].defect_name).count()
+                #     count_defect_name5_temp = modelGlassWithDefect.objects.filter(defect_name5=data_defect[i].defect_name).count()
+
+                #     count_defect_name1 = count_defect_name1 + count_defect_name1_temp
+                #     count_defect_name2 = count_defect_name2 + count_defect_name2_temp
+                #     count_defect_name3 = count_defect_name3 + count_defect_name3_temp
+                #     count_defect_name4 = count_defect_name4 + count_defect_name4_temp
+                #     count_defect_name5 = count_defect_name5 + count_defect_name5_temp
+                #     count_defect_all = count_defect_name1 + count_defect_name2 + count_defect_name3 + count_defect_name4 + count_defect_name5
+                #     print(data_defect[i].defect_name, ' = ' ,count_defect_all)
+
+                #         # labels.append(data_defect[i].defect_name)
+                #     labels.append(data_defect[i].defect_name)
+                # data.append(count_defect_all)
+                
+                return  render(request, 'report_filter.html', {
+                    'labels': labels,
+                    'data': data,
+                    'defects':data_defect,
+                    'inputDefect':inputDefect,
+                    'data_defects':queryset,
+                    'inputDefect_id':inputDefect,
+                    'shift':shift,
+                    'start_date':start_date,
+                    'end_date':end_date
+                        
+                    })
+            #-------------------->>>>> defect ALL + shift ALL    
+            else:
+                print("#-------------------->>>>> defect ALL + shift ALL + NO Date   2")
+            
+                queryset = modelGlassWithDefect.objects.filter(status_glass="NG")
+                for i in range(Defect.objects.all().count()):
+
+                    count_defect_name1_temp = modelGlassWithDefect.objects.filter(defect_name1=data_defect[i].defect_name).count()
+                    count_defect_name2_temp = modelGlassWithDefect.objects.filter(defect_name2=data_defect[i].defect_name).count()
+                    count_defect_name3_temp = modelGlassWithDefect.objects.filter(defect_name3=data_defect[i].defect_name).count()
+                    count_defect_name4_temp = modelGlassWithDefect.objects.filter(defect_name4=data_defect[i].defect_name).count()
+                    count_defect_name5_temp = modelGlassWithDefect.objects.filter(defect_name5=data_defect[i].defect_name).count()
+
+                    count_defect_name1 = count_defect_name1 + count_defect_name1_temp
+                    count_defect_name2 = count_defect_name2 + count_defect_name2_temp
+                    count_defect_name3 = count_defect_name3 + count_defect_name3_temp
+                    count_defect_name4 = count_defect_name4 + count_defect_name4_temp
+                    count_defect_name5 = count_defect_name5 + count_defect_name5_temp
+
+                    count_defect_all = count_defect_name1 + count_defect_name2 + count_defect_name3 + count_defect_name4 + count_defect_name5
+
+                    print(data_defect[i].defect_name, ' = ' ,count_defect_all)
+
+                    labels.append(data_defect[i].defect_name)
+                    data.append(count_defect_all)
+
+                return  render(request, 'report_filter.html', {
+                    'labels': labels,
+                    'data': data,
+                    'defects':data_defect,
+                    'inputDefect':inputDefect,
+                    'data_defects':queryset,
+                    'inputDefect_id':inputDefect,
+                    'shift':shift,
+                    'start_date':start_date,
+                    'end_date':end_date
+                    
+                })    
+        #-------------------->>>>> defect ALL + shift NO All         
+        else:
+
+            if start_date:
+                print("#-------------------->>>>> defect ALL + shift NO All   + Date   3")
+                # filter สองอันพร้อมกัน filter สองอันพร้อมกันfilter สองอันพร้อมกันfilter สองอันพร้อมกันfilter สองอันพร้อมกันfilter สองอันพร้อมกันfilter สองอันพร้อมกัน
+
+                queryset = modelGlassWithDefect.objects.filter(shift=shift).filter(status_glass="NG").filter(date_create__range=(start_date, end_date))
+                count_row_mix = modelGlassWithDefect.objects.filter(shift=shift).filter(status_glass="NG").filter(date_create__range=(start_date, end_date)).count()
+                print('count_row_mix =', count_row_mix )
+
+                # filter สองอันพร้อมกัน filter สองอันพร้อมกันfilter สองอันพร้อมกันfilter สองอันพร้อมกันfilter สองอันพร้อมกันfilter สองอันพร้อมกันfilter สองอันพร้อมกัน
+                
+                list_of_label = []
+                
+
+                for i in range(count_row_mix):
+                    for k in range(data_defect.count()):
+                        if data_defect[k].defect_name == queryset[i].defect_name1:
+                            count_defect_name1_temp = 1
+                            count_defect_name1 = count_defect_name1 + count_defect_name1_temp
+                            list_of_label.append(data_defect[k].defect_name)
+                            
+                        if data_defect[k].defect_name == queryset[i].defect_name2:
+                            count_defect_name2_temp = 1
+                            count_defect_name2 = count_defect_name2 + count_defect_name2_temp
+                            list_of_label.append(data_defect[k].defect_name)
+                            
+                        if data_defect[k].defect_name == queryset[i].defect_name3:
+                            count_defect_name3_temp = 1
+                            count_defect_name3 = count_defect_name3 + count_defect_name3_temp
+                            list_of_label.append(data_defect[k].defect_name)
+                            
+                        if data_defect[k].defect_name == queryset[i].defect_name4:
+                            count_defect_name4_temp = 1
+                            count_defect_name4 = count_defect_name4 + count_defect_name4_temp
+                            list_of_label.append(data_defect[k].defect_name)
+                            
+                        if data_defect[k].defect_name == queryset[i].defect_name5:
+                            count_defect_name5_temp = 1
+                            count_defect_name5 = count_defect_name5 + count_defect_name5_temp
+                            list_of_label.append(data_defect[k].defect_name)
+                        
+                        
+                        # count_defect_all = count_defect_name1 + count_defect_name2 + count_defect_name3 + count_defect_name4 + count_defect_name5
+        
+                print(list_of_label)
+
+                Counter(list_of_label).keys() # equals to list(set(words))
+                Counter(list_of_label).values() # counts the elements' frequency
+                label_list = list(Counter(list_of_label).keys())
+                data_list = list(Counter(list_of_label).values())
+                print(len(label_list))
+                for i in range(len(label_list)):  # จัดเก็บลง label กับ data
+                    labels.append(label_list[i])   
+                    data.append(data_list[i])
+
+                print(labels)
+                print(data)
+            
+            
+                return  render(request, 'report_filter.html', {
+                    'labels': labels,
+                    'data': data,
+                    'defects':data_defect,
+                    'inputDefect':inputDefect,
+                    'data_defects':queryset,
+                    'inputDefect_id':inputDefect,
+                    'shift':shift,
+                    'start_date':start_date,
+                    'end_date':end_date
+                    
+                })
+            else:
+                print("#-------------------->>>>> defect ALL + shift NO All   + NO Date   4")
+                # filter สองอันพร้อมกัน filter สองอันพร้อมกันfilter สองอันพร้อมกันfilter สองอันพร้อมกันfilter สองอันพร้อมกันfilter สองอันพร้อมกันfilter สองอันพร้อมกัน
+
+                queryset = modelGlassWithDefect.objects.filter(shift=shift).filter(status_glass="NG")
+                count_row_mix = modelGlassWithDefect.objects.filter(shift=shift).filter(status_glass="NG").count()
+                print('count_row_mix =', count_row_mix )
+
+                # filter สองอันพร้อมกัน filter สองอันพร้อมกันfilter สองอันพร้อมกันfilter สองอันพร้อมกันfilter สองอันพร้อมกันfilter สองอันพร้อมกันfilter สองอันพร้อมกัน
+                
+                list_of_label = []
+                
+
+                for i in range(count_row_mix):
+                    for k in range(data_defect.count()):
+                        if data_defect[k].defect_name == queryset[i].defect_name1:
+                            count_defect_name1_temp = 1
+                            count_defect_name1 = count_defect_name1 + count_defect_name1_temp
+                            list_of_label.append(data_defect[k].defect_name)
+                            
+                        if data_defect[k].defect_name == queryset[i].defect_name2:
+                            count_defect_name2_temp = 1
+                            count_defect_name2 = count_defect_name2 + count_defect_name2_temp
+                            list_of_label.append(data_defect[k].defect_name)
+                            
+                        if data_defect[k].defect_name == queryset[i].defect_name3:
+                            count_defect_name3_temp = 1
+                            count_defect_name3 = count_defect_name3 + count_defect_name3_temp
+                            list_of_label.append(data_defect[k].defect_name)
+                            
+                        if data_defect[k].defect_name == queryset[i].defect_name4:
+                            count_defect_name4_temp = 1
+                            count_defect_name4 = count_defect_name4 + count_defect_name4_temp
+                            list_of_label.append(data_defect[k].defect_name)
+                            
+                        if data_defect[k].defect_name == queryset[i].defect_name5:
+                            count_defect_name5_temp = 1
+                            count_defect_name5 = count_defect_name5 + count_defect_name5_temp
+                            list_of_label.append(data_defect[k].defect_name)
+                        
+                        
+                        # count_defect_all = count_defect_name1 + count_defect_name2 + count_defect_name3 + count_defect_name4 + count_defect_name5
+        
+                print(list_of_label)
+
+                Counter(list_of_label).keys() # equals to list(set(words))
+                Counter(list_of_label).values() # counts the elements' frequency
+                label_list = list(Counter(list_of_label).keys())
+                data_list = list(Counter(list_of_label).values())
+                print(len(label_list))
+                for i in range(len(label_list)):  # จัดเก็บลง label กับ data
+                    labels.append(label_list[i])   
+                    data.append(data_list[i])
+
+                print(labels)
+                print(data)
+            
+            
+                return  render(request, 'report_filter.html', {
+                    'labels': labels,
+                    'data': data,
+                    'defects':data_defect,
+                    'inputDefect':inputDefect,
+                    'data_defects':queryset,
+                    'inputDefect_id':inputDefect,
+                    'shift':shift,
+                    'start_date':start_date,
+                    'end_date':end_date
+                    
+                })
+    #-------------------->>>>> inputDefect NO ALL
+    else:
+
+        
+        if shift == 'ALL' :
+
+            #-------------------->>>>> inputDefect NO ALL  + shift ALL + Date
+            if start_date:
+                print("#-------------------->>>>> inputDefect NO ALL  + shift ALL + Date   5")
+                objModeldefect = Defect.objects.get(id=inputDefect)
+                # queryset = modelGlassWithDefect.objects.filter(defect_name1=objModeldefect.defect_name) | modelGlassWithDefect.objects.filter(defect_name2=objModeldefect.defect_name) | modelGlassWithDefect.objects.filter(defect_name3=objModeldefect.defect_name) | modelGlassWithDefect.objects.filter(defect_name4=objModeldefect.defect_name) | modelGlassWithDefect.objects.filter(defect_name5=objModeldefect.defect_name)| modelGlassWithDefect.objects.filter(shift=shift) 
+     
+                queryset = modelGlassWithDefect.objects.filter(date_select__range=(start_date, end_date)).filter(Q(defect_name1=objModeldefect.defect_name) 
+                | Q(defect_name2=objModeldefect.defect_name) 
+                | Q(defect_name3=objModeldefect.defect_name) 
+                | Q(defect_name4=objModeldefect.defect_name) 
+                | Q(defect_name5=objModeldefect.defect_name))
+                
+                print('count_row_mix  = ' ,modelGlassWithDefect.objects.filter(date_select__range=(start_date, end_date)).filter(Q(defect_name1=objModeldefect.defect_name) 
+                | Q(defect_name2=objModeldefect.defect_name) 
+                | Q(defect_name3=objModeldefect.defect_name) 
+                | Q(defect_name4=objModeldefect.defect_name) 
+                | Q(defect_name5=objModeldefect.defect_name)).count() )
+                count_row_mix = modelGlassWithDefect.objects.filter(date_select__range=(start_date, end_date)).filter(Q(defect_name1=objModeldefect.defect_name) 
+                | Q(defect_name2=objModeldefect.defect_name) 
+                | Q(defect_name3=objModeldefect.defect_name) 
+                | Q(defect_name4=objModeldefect.defect_name) 
+                | Q(defect_name5=objModeldefect.defect_name)).count()
+                
+                
+                labels.append(objModeldefect.defect_name)
+                data.append(count_row_mix)
+                
+                return  render(request, 'report_filter.html', {
+                    'labels': labels,
+                    'data': data,
+                    'defects':data_defect,
+                    'inputDefect':objModeldefect.defect_name,
+                    'data_defects':queryset,
+                    'inputDefect_id':inputDefect,
+                    'shift':shift,
+                    'start_date':start_date,
+                    'end_date':end_date
+                        
+                    })
+ 
+                    
+            #-------------------->>>>> inputDefect NO ALL  + shift ALL + NO date  
+            else:
+                print("#-------------------->>>>> inputDefect NO ALL  + shift ALL + NO Date   6")
+        
+                objModeldefect = Defect.objects.get(id=inputDefect)
+                queryset = modelGlassWithDefect.objects.filter(Q(defect_name1=objModeldefect.defect_name) 
+                | Q(defect_name2=objModeldefect.defect_name) 
+                | Q(defect_name3=objModeldefect.defect_name) 
+                | Q(defect_name4=objModeldefect.defect_name) 
+                | Q(defect_name5=objModeldefect.defect_name))
+
+                count_row_mix = modelGlassWithDefect.objects.filter(Q(defect_name1=objModeldefect.defect_name) 
+                | Q(defect_name2=objModeldefect.defect_name) 
+                | Q(defect_name3=objModeldefect.defect_name) 
+                | Q(defect_name4=objModeldefect.defect_name) 
+                | Q(defect_name5=objModeldefect.defect_name)).count()
+
+                list_of_label = []
+                
+
+                for i in range(count_row_mix):
+                    for k in range(data_defect.count()):
+                        if data_defect[k].defect_name == queryset[i].defect_name1:
+                            count_defect_name1_temp = 1
+                            count_defect_name1 = count_defect_name1 + count_defect_name1_temp
+                            list_of_label.append(data_defect[k].defect_name)
+                            
+                        if data_defect[k].defect_name == queryset[i].defect_name2:
+                            count_defect_name2_temp = 1
+                            count_defect_name2 = count_defect_name2 + count_defect_name2_temp
+                            list_of_label.append(data_defect[k].defect_name)
+                            
+                        if data_defect[k].defect_name == queryset[i].defect_name3:
+                            count_defect_name3_temp = 1
+                            count_defect_name3 = count_defect_name3 + count_defect_name3_temp
+                            list_of_label.append(data_defect[k].defect_name)
+                            
+                        if data_defect[k].defect_name == queryset[i].defect_name4:
+                            count_defect_name4_temp = 1
+                            count_defect_name4 = count_defect_name4 + count_defect_name4_temp
+                            list_of_label.append(data_defect[k].defect_name)
+                            
+                        if data_defect[k].defect_name == queryset[i].defect_name5:
+                            count_defect_name5_temp = 1
+                            count_defect_name5 = count_defect_name5 + count_defect_name5_temp
+                            list_of_label.append(data_defect[k].defect_name)
+                        
+                        
+                        # count_defect_all = count_defect_name1 + count_defect_name2 + count_defect_name3 + count_defect_name4 + count_defect_name5
+        
+                print(list_of_label)
+
+                Counter(list_of_label).keys() # equals to list(set(words))
+                Counter(list_of_label).values() # counts the elements' frequency
+                label_list = list(Counter(list_of_label).keys())
+                data_list = list(Counter(list_of_label).values())
+                print(len(label_list))
+                for i in range(len(label_list)):  # จัดเก็บลง label กับ data
+                    labels.append(label_list[i])   
+                    data.append(data_list[i])
+
+                print(labels)
+                print(data)
+
+
+                # labels.append(objModeldefect.defect_name)
+                # data.append(count_row_mix)
+
+                return  render(request, 'report_filter.html', {
+                    'labels': labels,
+                    'data': data,
+                    'defects':data_defect,
+                    'inputDefect':objModeldefect.defect_name,
+                    'data_defects':queryset,
+                    'inputDefect_id':inputDefect,
+                    'shift':shift,
+                    'start_date':start_date,
+                    'end_date':end_date
+                    
+                })    
+        #-------------------->>>>> inputDefect NO ALL  + shift NO ALL    
+        else:
+            #-------------------->>>>> inputDefect NO ALL  + shift NO ALL  + Date
+            if start_date:
+                print("#-------------------->>>>> inputDefect NO ALL  + shift NO ALL  + Date  7")
+
+                objModeldefect = Defect.objects.get(id=inputDefect)
+                queryset = modelGlassWithDefect.objects.filter(Q(defect_name1=objModeldefect.defect_name) 
+                | Q(defect_name2=objModeldefect.defect_name) 
+                | Q(defect_name3=objModeldefect.defect_name) 
+                | Q(defect_name4=objModeldefect.defect_name) 
+                | Q(defect_name5=objModeldefect.defect_name)).filter(shift=shift).filter(date_select__range=(start_date, end_date))
+
+                count_row_mix = modelGlassWithDefect.objects.filter(Q(defect_name1=objModeldefect.defect_name) 
+                | Q(defect_name2=objModeldefect.defect_name) 
+                | Q(defect_name3=objModeldefect.defect_name) 
+                | Q(defect_name4=objModeldefect.defect_name) 
+                | Q(defect_name5=objModeldefect.defect_name)).filter(shift=shift).filter(date_select__range=(start_date, end_date)).count()
+
+             
+                print('count_row_mix =', count_row_mix )
+
+                # filter สองอันพร้อมกัน filter สองอันพร้อมกันfilter สองอันพร้อมกันfilter สองอันพร้อมกันfilter สองอันพร้อมกันfilter สองอันพร้อมกันfilter สองอันพร้อมกัน
+                
+                list_of_label = []
+                
+
+                for i in range(count_row_mix):
+                    for k in range(data_defect.count()):
+                        if data_defect[k].defect_name == queryset[i].defect_name1:
+                            count_defect_name1_temp = 1
+                            count_defect_name1 = count_defect_name1 + count_defect_name1_temp
+                            list_of_label.append(data_defect[k].defect_name)
+                            
+                        if data_defect[k].defect_name == queryset[i].defect_name2:
+                            count_defect_name2_temp = 1
+                            count_defect_name2 = count_defect_name2 + count_defect_name2_temp
+                            list_of_label.append(data_defect[k].defect_name)
+                            
+                        if data_defect[k].defect_name == queryset[i].defect_name3:
+                            count_defect_name3_temp = 1
+                            count_defect_name3 = count_defect_name3 + count_defect_name3_temp
+                            list_of_label.append(data_defect[k].defect_name)
+                            
+                        if data_defect[k].defect_name == queryset[i].defect_name4:
+                            count_defect_name4_temp = 1
+                            count_defect_name4 = count_defect_name4 + count_defect_name4_temp
+                            list_of_label.append(data_defect[k].defect_name)
+                            
+                        if data_defect[k].defect_name == queryset[i].defect_name5:
+                            count_defect_name5_temp = 1
+                            count_defect_name5 = count_defect_name5 + count_defect_name5_temp
+                            list_of_label.append(data_defect[k].defect_name)
+                        
+                        
+                        # count_defect_all = count_defect_name1 + count_defect_name2 + count_defect_name3 + count_defect_name4 + count_defect_name5
+        
+                print(list_of_label)
+
+                Counter(list_of_label).keys() # equals to list(set(words))
+                Counter(list_of_label).values() # counts the elements' frequency
+                label_list = list(Counter(list_of_label).keys())
+                data_list = list(Counter(list_of_label).values())
+                print(len(label_list))
+                for i in range(len(label_list)):  # จัดเก็บลง label กับ data
+                    labels.append(label_list[i])   
+                    data.append(data_list[i])
+
+                print(labels)
+                print(data)
+
+                return  render(request, 'report_filter.html', {
+                    'labels': labels,
+                    'data': data,
+                    'defects':data_defect,
+                    'inputDefect':objModeldefect.defect_name,
+                    'data_defects':queryset,
+                    'inputDefect_id':inputDefect,
+                    'shift':shift,
+                    'start_date':start_date,
+                    'end_date':end_date
+                    
+                })    
+
+            #-------------------->>>>> inputDefect NO ALL  + shift NO ALL  + NO Date        
+            else:        
+            # filter สองอันพร้อมกัน filter สองอันพร้อมกันfilter สองอันพร้อมกันfilter สองอันพร้อมกันfilter สองอันพร้อมกันfilter สองอันพร้อมกันfilter สองอันพร้อมกัน
+                print("#-------------------->>>>> inputDefect NO ALL  + shift NO ALL  + NO Date  8")
+                objModeldefect = Defect.objects.get(id=inputDefect)
+                queryset = modelGlassWithDefect.objects.filter(Q(defect_name1=objModeldefect.defect_name) 
+                | Q(defect_name2=objModeldefect.defect_name) 
+                | Q(defect_name3=objModeldefect.defect_name) 
+                | Q(defect_name4=objModeldefect.defect_name) 
+                | Q(defect_name5=objModeldefect.defect_name)).filter(shift=shift)
+
+                count_row_mix = modelGlassWithDefect.objects.filter(Q(defect_name1=objModeldefect.defect_name) 
+                | Q(defect_name2=objModeldefect.defect_name) 
+                | Q(defect_name3=objModeldefect.defect_name) 
+                | Q(defect_name4=objModeldefect.defect_name) 
+                | Q(defect_name5=objModeldefect.defect_name)).filter(shift=shift).count()
+
+             
+                print('count_row_mix =', count_row_mix )
+
+                # filter สองอันพร้อมกัน filter สองอันพร้อมกันfilter สองอันพร้อมกันfilter สองอันพร้อมกันfilter สองอันพร้อมกันfilter สองอันพร้อมกันfilter สองอันพร้อมกัน
+                
+                list_of_label = []
+                
+
+                for i in range(count_row_mix):
+                    for k in range(data_defect.count()):
+                        if data_defect[k].defect_name == queryset[i].defect_name1:
+                            count_defect_name1_temp = 1
+                            count_defect_name1 = count_defect_name1 + count_defect_name1_temp
+                            list_of_label.append(data_defect[k].defect_name)
+                            
+                        if data_defect[k].defect_name == queryset[i].defect_name2:
+                            count_defect_name2_temp = 1
+                            count_defect_name2 = count_defect_name2 + count_defect_name2_temp
+                            list_of_label.append(data_defect[k].defect_name)
+                            
+                        if data_defect[k].defect_name == queryset[i].defect_name3:
+                            count_defect_name3_temp = 1
+                            count_defect_name3 = count_defect_name3 + count_defect_name3_temp
+                            list_of_label.append(data_defect[k].defect_name)
+                            
+                        if data_defect[k].defect_name == queryset[i].defect_name4:
+                            count_defect_name4_temp = 1
+                            count_defect_name4 = count_defect_name4 + count_defect_name4_temp
+                            list_of_label.append(data_defect[k].defect_name)
+                            
+                        if data_defect[k].defect_name == queryset[i].defect_name5:
+                            count_defect_name5_temp = 1
+                            count_defect_name5 = count_defect_name5 + count_defect_name5_temp
+                            list_of_label.append(data_defect[k].defect_name)
+                        
+                        
+                        # count_defect_all = count_defect_name1 + count_defect_name2 + count_defect_name3 + count_defect_name4 + count_defect_name5
+        
+                print(list_of_label)
+
+                Counter(list_of_label).keys() # equals to list(set(words))
+                Counter(list_of_label).values() # counts the elements' frequency
+                label_list = list(Counter(list_of_label).keys())
+                data_list = list(Counter(list_of_label).values())
+                print(len(label_list))
+                for i in range(len(label_list)):  # จัดเก็บลง label กับ data
+                    labels.append(label_list[i])   
+                    data.append(data_list[i])
+
+                print(labels)
+                print(data)
+            
+                return  render(request, 'report_filter.html', {
+                    'labels': labels,
+                    'data': data,
+                    'defects':data_defect,
+                    'inputDefect':objModeldefect.defect_name,
+                    'data_defects':queryset,
+                    'inputDefect_id':inputDefect,
+                    'shift':shift,
+                    'start_date':start_date,
+                    'end_date':end_date
+                    
+                })   
+
+
+
+
+
+        # objModeldefect = Defect.objects.get(id=inputDefect)
+        # queryset = modelGlassWithDefect.objects.filter(defect_name1=objModeldefect.defect_name) | modelGlassWithDefect.objects.filter(defect_name2=objModeldefect.defect_name) | modelGlassWithDefect.objects.filter(defect_name3=objModeldefect.defect_name) | modelGlassWithDefect.objects.filter(defect_name4=objModeldefect.defect_name) | modelGlassWithDefect.objects.filter(defect_name5=objModeldefect.defect_name)| modelGlassWithDefect.objects.filter(shift=shift) 
+                    
+        
+        # # print('data_defect >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' ,data_defect[0].defect_name)
+        # # for i in range(Defect.objects.all().count()):
+
+        # for i in range(Defect.objects.filter(defect_name=objModeldefect.defect_name).count()):
+        #     count_defect_name1_temp = modelGlassWithDefect.objects.filter(defect_name1=objModeldefect.defect_name).count()
+        #     count_defect_name2_temp = modelGlassWithDefect.objects.filter(defect_name2=objModeldefect.defect_name).count()
+        #     count_defect_name3_temp = modelGlassWithDefect.objects.filter(defect_name3=objModeldefect.defect_name).count()
+        #     count_defect_name4_temp = modelGlassWithDefect.objects.filter(defect_name4=objModeldefect.defect_name).count()
+        #     count_defect_name5_temp = modelGlassWithDefect.objects.filter(defect_name5=objModeldefect.defect_name).count()
+
+        #     count_defect_name1 = count_defect_name1 + count_defect_name1_temp
+        #     count_defect_name2 = count_defect_name2 + count_defect_name2_temp
+        #     count_defect_name3 = count_defect_name3 + count_defect_name3_temp
+        #     count_defect_name4 = count_defect_name4 + count_defect_name4_temp
+        #     count_defect_name5 = count_defect_name5 + count_defect_name5_temp
+        #     count_defect_all = count_defect_name1 + count_defect_name2 + count_defect_name3 + count_defect_name4 + count_defect_name5
+        #     print(data_defect[i].defect_name, ' = ' ,count_defect_all)
+
+        #     # labels.append(data_defect[i].defect_name)
+        #     data.append(count_defect_all)
+        # labels.append(objModeldefect.defect_name)
+    
+        # return  render(request, 'report_filter.html', {
+        #     'labels': labels,
+        #     'data': data,
+        #     'defects':data_defect,
+        #     'inputDefect':objModeldefect.defect_name,
+        #     'data_defects':queryset,
+        #     'inputDefect_id':inputDefect,
+        #     'shift':shift,
+        #     'start_date':start_date,
+        #     'end_date':end_date
+            
+        # })
+
 
 
 def createForm(request):
@@ -124,6 +753,9 @@ def addUser(request):
     else:
         messages.error(request,'password ไม่ตรงกัน')
         return redirect('/createForm')
+
+
+
 
 def login(request):
     username = request.POST['username']
