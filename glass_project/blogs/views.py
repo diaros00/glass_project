@@ -1,8 +1,9 @@
 from django.shortcuts import render,redirect
-from .models import Defect , modelGlass , modelGlassWithDefect
+# from .models import Defect , modelGlass , modelGlassWithDefect
+from .models import Defect 
 from django.contrib.auth.models import User,auth
 from django.contrib import messages
-from .models import UserProfile
+# from .models import UserProfile
 from django.core.files.storage import FileSystemStorage
 from django.db.models import Count, Case, When, IntegerField
 import datetime
